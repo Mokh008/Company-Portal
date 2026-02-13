@@ -6,33 +6,34 @@
 
 <style>
 :root{
-  --bg: #0f172a;
-  --card: #1e293b;
+  --bg: #0b0f19;
+  --card: #121826;
   --accent: #2dd4bf;
   --text: #f1f5f9;
   --muted: #94a3b8;
+  --border: #1f2937;
 }
 
 body{
   margin:0;
   font-family: 'Segoe UI', sans-serif;
-  background: var(--bg);
+  background: linear-gradient(180deg,#0b0f19 0%, #0e1422 100%);
   color: var(--text);
 }
 
-.container{
-  padding:40px;
-  position:relative;
-}
-
-/* Watermark Logo */
+/* Watermark */
 .watermark{
   position:fixed;
-  right:-150px;
-  bottom:-150px;
-  width:700px;
-  opacity:0.03;
+  right:-200px;
+  bottom:-200px;
+  width:900px;
+  opacity:0.025;
   pointer-events:none;
+}
+
+/* Container */
+.container{
+  padding:50px 60px;
 }
 
 /* Header */
@@ -40,7 +41,7 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:40px;
+  margin-bottom:60px;
 }
 
 .brand{
@@ -49,10 +50,15 @@ body{
   gap:15px;
 }
 
+.brand img{
+  height:45px;
+}
+
 .brand h1{
   margin:0;
-  font-size:22px;
-  letter-spacing:1px;
+  font-size:26px;
+  font-weight:600;
+  letter-spacing:2px;
 }
 
 .user-info{
@@ -64,65 +70,79 @@ body{
   cursor:pointer;
   color:var(--accent);
   font-weight:500;
+  margin-top:5px;
+}
+
+.logout:hover{
+  opacity:0.8;
 }
 
 /* Projects */
 .projects{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
-  gap:25px;
-  margin-bottom:50px;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap:30px;
+  margin-bottom:60px;
 }
 
 .project-card{
   background:var(--card);
-  border-radius:16px;
-  padding:30px;
+  border-radius:20px;
+  padding:40px;
   text-align:center;
   cursor:pointer;
-  transition:0.3s;
-  border:1px solid transparent;
+  transition:0.4s ease;
+  border:1px solid var(--border);
 }
 
 .project-card:hover{
+  transform:translateY(-8px);
   border:1px solid var(--accent);
-  transform:translateY(-5px);
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
 }
 
 .project-card img{
-  width:60px;
-  margin-bottom:15px;
+  width:90px;
+  margin-bottom:20px;
 }
 
 .project-card h3{
   margin:0;
   font-weight:500;
+  font-size:18px;
 }
 
 /* Stats */
 .stats{
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap:25px;
+  grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+  gap:30px;
 }
 
 .stat-card{
   background:var(--card);
-  padding:25px;
-  border-radius:16px;
-  border:1px solid #1e293b;
+  padding:35px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  transition:0.3s;
+}
+
+.stat-card:hover{
+  border:1px solid var(--accent);
+  box-shadow:0 15px 40px rgba(0,0,0,0.5);
 }
 
 .stat-card h4{
   margin:0;
   font-weight:400;
   color:var(--muted);
-  font-size:14px;
+  font-size:13px;
+  letter-spacing:1px;
 }
 
 .value{
-  margin-top:10px;
-  font-size:26px;
+  margin-top:15px;
+  font-size:30px;
   font-weight:600;
   color:var(--accent);
 }
@@ -131,12 +151,13 @@ body{
 
 <body>
 
-<img src="mk-logo.png" class="watermark">
+<img src="assets/icons/mk-nexus.png" class="watermark">
 
 <div class="container">
 
   <div class="header">
     <div class="brand">
+      <img src="assets/icons/mk-nexus.png">
       <h1>MK Nexus</h1>
     </div>
 
@@ -177,7 +198,7 @@ function addProject(title, link, icon){
   const div = document.createElement("div");
   div.className="project-card";
   div.innerHTML=`
-    <img src="${icon}">
+    <img src="assets/icons/${icon}">
     <h3>${title}</h3>
   `;
   div.onclick=()=>window.open(link,"_blank");
@@ -186,7 +207,7 @@ function addProject(title, link, icon){
 
 if(user.role==="engineer"){
   addProject("Expenses", PROJECT_LINKS.expenses, "expenses.png");
-  addProject("Rentals", PROJECT_LINKS.rentals, "rentals.png");
+  addProject("Rentals", PROJECT_LINKS.rentals, "rental.png");
 
   if(user.employee_id==1001194){
     addProject("Attendance", PROJECT_LINKS.attendance, "attendance.png");
@@ -196,7 +217,7 @@ if(user.role==="engineer"){
 if(user.role==="admin" || user.role==="manager"){
   addProject("Attendance", PROJECT_LINKS.attendance, "attendance.png");
   addProject("Expenses", PROJECT_LINKS.expenses, "expenses.png");
-  addProject("Rentals", PROJECT_LINKS.rentals, "rentals.png");
+  addProject("Rentals", PROJECT_LINKS.rentals, "rental.png");
 
   fetch(API_URL,{
     method:"POST",
