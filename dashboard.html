@@ -1,161 +1,242 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Company Control Panel</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      display: flex;
-      margin: 0;
-      font-family: Arial;
-      background: #f4f6f9;
-    }
+<meta charset="UTF-8" />
+<title>MK Nexus</title>
 
-    .sidebar {
-      width: 220px;
-      background: #2c3e50;
-      color: white;
-      height: 100vh;
-      padding: 20px;
-    }
+<style>
+:root{
+  --bg: #0f172a;
+  --card: #1e293b;
+  --accent: #2dd4bf;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+}
 
-    .sidebar h3 {
-      margin-top: 0;
-    }
+body{
+  margin:0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-    .sidebar button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      background: #34495e;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
+.container{
+  padding:40px;
+  position:relative;
+}
 
-    .main {
-      flex: 1;
-      padding: 30px;
-    }
+/* Watermark Logo */
+.watermark{
+  position:fixed;
+  right:-150px;
+  bottom:-150px;
+  width:700px;
+  opacity:0.03;
+  pointer-events:none;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
+/* Header */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:40px;
+}
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-  </style>
+.brand{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.brand h1{
+  margin:0;
+  font-size:22px;
+  letter-spacing:1px;
+}
+
+.user-info{
+  color:var(--muted);
+  font-size:14px;
+}
+
+.logout{
+  cursor:pointer;
+  color:var(--accent);
+  font-weight:500;
+}
+
+/* Projects */
+.projects{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap:25px;
+  margin-bottom:50px;
+}
+
+.project-card{
+  background:var(--card);
+  border-radius:16px;
+  padding:30px;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+  border:1px solid transparent;
+}
+
+.project-card:hover{
+  border:1px solid var(--accent);
+  transform:translateY(-5px);
+}
+
+.project-card img{
+  width:60px;
+  margin-bottom:15px;
+}
+
+.project-card h3{
+  margin:0;
+  font-weight:500;
+}
+
+/* Stats */
+.stats{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap:25px;
+}
+
+.stat-card{
+  background:var(--card);
+  padding:25px;
+  border-radius:16px;
+  border:1px solid #1e293b;
+}
+
+.stat-card h4{
+  margin:0;
+  font-weight:400;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.value{
+  margin-top:10px;
+  font-size:26px;
+  font-weight:600;
+  color:var(--accent);
+}
+</style>
 </head>
 
 <body>
 
-<div class="sidebar">
-  <h3>Company Panel</h3>
-  <div id="projectLinks"></div>
-  <button onclick="logout()">Logout</button>
-</div>
+<img src="mk-logo.png" class="watermark">
 
-<div class="main">
-  <h2 id="welcomeText"></h2>
-  <div id="dashboardSection"></div>
+<div class="container">
+
+  <div class="header">
+    <div class="brand">
+      <h1>MK Nexus</h1>
+    </div>
+
+    <div>
+      <div class="user-info" id="userInfo"></div>
+      <div class="logout" onclick="logout()">Logout</div>
+    </div>
+  </div>
+
+  <div id="projectsSection" class="projects"></div>
+
+  <div id="statsSection"></div>
+
 </div>
 
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyl1P_4MqzZCKcEHzIvE1edB94lLcctBI9XHoCOgscKPXtF2l7_T8HIkP_y0qPoPsYl/exec";
+const API_URL = "PUT_YOUR_API_URL_HERE";
 
 const PROJECT_LINKS = {
-  expenses: "https://mokh008.github.io/Expenses-System/",
-  rentals: "https://mokh008.github.io/Rent-Payment-UI/",
-  attendance: "https://mokh008.github.io/Attendance-Login/"
+  attendance: "PUT_ATTENDANCE_LINK",
+  expenses: "PUT_EXPENSES_LINK",
+  rentals: "PUT_RENT_LINK"
 };
 
 const user = JSON.parse(localStorage.getItem("user"));
 
-if (!user) {
-  window.location.href = "index.html";
+if(!user){
+  window.location.href="index.html";
 }
 
-document.getElementById("welcomeText").innerText =
-  `Welcome ${user.name} (${user.role})`;
+document.getElementById("userInfo").innerText =
+  `${user.name} • ${user.role}`;
 
-// ===== PROJECT BUTTONS =====
-const projectDiv = document.getElementById("projectLinks");
+/* ========= PROJECTS ========= */
 
-function addButton(title, link) {
-  const btn = document.createElement("button");
-  btn.innerText = title;
-  btn.onclick = () => window.open(link, "_blank");
-  projectDiv.appendChild(btn);
+function addProject(title, link, icon){
+  const div = document.createElement("div");
+  div.className="project-card";
+  div.innerHTML=`
+    <img src="${icon}">
+    <h3>${title}</h3>
+  `;
+  div.onclick=()=>window.open(link,"_blank");
+  document.getElementById("projectsSection").appendChild(div);
 }
 
-// Engineer
-if (user.role === "engineer") {
-  addButton("Expenses", PROJECT_LINKS.expenses);
-  addButton("Rentals", PROJECT_LINKS.rentals);
+if(user.role==="engineer"){
+  addProject("Expenses", PROJECT_LINKS.expenses, "expenses.png");
+  addProject("Rentals", PROJECT_LINKS.rentals, "rentals.png");
 
-  if (user.employee_id == 1001194) {
-    addButton("Attendance", PROJECT_LINKS.attendance);
+  if(user.employee_id==1001194){
+    addProject("Attendance", PROJECT_LINKS.attendance, "attendance.png");
   }
 }
 
-// Manager & Admin
-if (user.role === "admin" || user.role === "manager") {
-  addButton("Expenses", PROJECT_LINKS.expenses);
-  addButton("Rentals", PROJECT_LINKS.rentals);
-  addButton("Attendance", PROJECT_LINKS.attendance);
-}
+if(user.role==="admin" || user.role==="manager"){
+  addProject("Attendance", PROJECT_LINKS.attendance, "attendance.png");
+  addProject("Expenses", PROJECT_LINKS.expenses, "expenses.png");
+  addProject("Rentals", PROJECT_LINKS.rentals, "rentals.png");
 
-// ===== DASHBOARD DATA =====
-if (user.role === "admin" || user.role === "manager") {
-
-  fetch(API_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      action: "dashboard",
-      user: user
+  fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"dashboard",
+      user:user
     })
   })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("dashboardSection").innerHTML = `
-      <div class="cards">
-        <div class="card">
+  .then(res=>res.json())
+  .then(data=>{
+    document.getElementById("statsSection").innerHTML=`
+      <div class="stats">
+        <div class="stat-card">
           <h4>Monthly Expenses</h4>
-          <p>${data.expenses.monthlyTotal}</p>
+          <div class="value">${data.expenses.monthlyTotal}</div>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Total Expenses</h4>
-          <p>${data.expenses.total}</p>
+          <div class="value">${data.expenses.total}</div>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Monthly Rent</h4>
-          <p>${data.rent.monthlyTotal}</p>
+          <div class="value">${data.rent.monthlyTotal}</div>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Total Rent</h4>
-          <p>${data.rent.total}</p>
+          <div class="value">${data.rent.total}</div>
         </div>
-        <div class="card">
+        <div class="stat-card">
           <h4>Active Employees</h4>
-          <p>${data.activeEmployees}</p>
+          <div class="value">${data.activeEmployees}</div>
         </div>
       </div>
     `;
   });
 }
 
-function logout() {
+function logout(){
   localStorage.removeItem("user");
-  window.location.href = "index.html";
+  window.location.href="index.html";
 }
 
 </script>
