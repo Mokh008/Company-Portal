@@ -37,8 +37,6 @@ body{
   transition:.3s;
 }
 
-/* ===== SIDEBAR ===== */
-
 .sidebar{
   width:230px;
   background:var(--card);
@@ -53,8 +51,6 @@ body{
   letter-spacing:2px;
   margin-bottom:40px;
 }
-
-/* ===== MAIN ===== */
 
 .main{
   flex:1;
@@ -87,8 +83,6 @@ button, select{
 button:hover{
   border-color:var(--accent);
 }
-
-/* ===== PROJECT PORTAL ===== */
 
 .projects{
   display:grid;
@@ -124,8 +118,6 @@ button:hover{
   letter-spacing:1px;
 }
 
-/* ===== KPI ===== */
-
 .kpis{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -159,8 +151,6 @@ button:hover{
 .healthy{color:var(--accent);}
 .risk{color:var(--danger);}
 
-/* ===== CHARTS ===== */
-
 .charts{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
@@ -173,8 +163,6 @@ button:hover{
   border-radius:18px;
   border:1px solid var(--border);
 }
-
-/* ===== LOADER ===== */
 
 .loader-overlay{
   position:fixed;
@@ -198,8 +186,6 @@ button:hover{
 @keyframes spin{
   to{transform:rotate(360deg);}
 }
-
-/* ===== TOAST ===== */
 
 .toast{
   position:fixed;
@@ -236,7 +222,6 @@ button:hover{
   </div>
 
   <div id="projectsSection" class="projects"></div>
-
   <div id="kpiSection" class="kpis"></div>
 
   <div class="charts">
@@ -253,7 +238,6 @@ button:hover{
 </div>
 
 <div id="toast" class="toast"></div>
-
 <div id="loaderOverlay" class="loader-overlay">
   <div class="spinner"></div>
 </div>
@@ -262,19 +246,16 @@ button:hover{
 
 const API_URL="https://script.google.com/macros/s/AKfycbxjCIb55qiykf7T78Lb-qTxHYATDlxiFt72ZApTUuTPh1StsQUAOYGZ0NiN4Ib89bEU/exec";
 
-const PROJECT_LINKS={
-  attendance:"PUT_ATTENDANCE_LINK",
-  expenses:"PUT_EXPENSES_LINK",
-  rentals:"PUT_RENT_LINK"
-};
+const projectsSection = document.getElementById("projectsSection");
+const kpiSection = document.getElementById("kpiSection");
+const toast = document.getElementById("toast");
+const loaderOverlay = document.getElementById("loaderOverlay");
 
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
 document.getElementById("userInfo").innerText=
 `${user.name} • ${user.role}`;
-
-/* ===== MONTH FILTER ===== */
 
 const monthSelect=document.getElementById("monthFilter");
 for(let i=1;i<=12;i++){
@@ -283,8 +264,6 @@ for(let i=1;i<=12;i++){
   opt.textContent="Month "+i;
   monthSelect.appendChild(opt);
 }
-
-/* ===== PROJECTS ===== */
 
 function addProject(title,link,icon){
   const div=document.createElement("div");
@@ -295,19 +274,17 @@ function addProject(title,link,icon){
 }
 
 if(user.role==="engineer"){
-  addProject("Expenses",PROJECT_LINKS.expenses,"💰");
-  addProject("Rentals",PROJECT_LINKS.rentals,"🏢");
+  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
+  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
 }
 
 if(user.role==="manager"||user.role==="admin"){
-  addProject("Attendance","https://mokh008.github.io/Attendance-Login/.attendance,"🕒");
-  addProject("Expenses","https://mokh008.github.io/Expenses-System/.expenses,"💰");
-  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/.rentals,"🏢");
+  addProject("Attendance","https://mokh008.github.io/Attendance-Login/","🕒");
+  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
+  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
 }
 
-/* ===== ANALYTICS ===== */
-
-let rentChart, employeeChart, globalData;
+let rentChart, employeeChart;
 
 function currency(n){return new Intl.NumberFormat().format(n);}
 
@@ -322,15 +299,13 @@ function loadData(){
   })
   .then(res=>res.json())
   .then(data=>{
-    globalData=data;
+    if(!data || !data.kpis){ hideLoader(); return; }
     renderKPIs(data.kpis);
     renderCharts(data);
     hideLoader();
-    showToast("Data Updated");
   })
   .catch(()=>{
     hideLoader();
-    showToast("Error Loading Data");
   });
 }
 
@@ -348,8 +323,7 @@ function renderKPIs(kpis){
     div.innerHTML=`
       <div class="kpi-title">${i.title}</div>
       <div class="kpi-value">${currency(i.value)}</div>
-      ${i.title==="Net Profit"?
-        `<div class="badge ${status==="Healthy"?"healthy":"risk"}">${status}</div>`:""}
+      ${i.title==="Net Profit"?`<div class="badge ${status==="Healthy"?"healthy":"risk"}">${status}</div>`:""}
     `;
     kpiSection.appendChild(div);
   });
@@ -360,20 +334,18 @@ function renderCharts(data){
   if(rentChart) rentChart.destroy();
   if(employeeChart) employeeChart.destroy();
 
-  rentChart=new Chart(rentChart=document.getElementById("rentChart"),{
+  rentChart=new Chart(document.getElementById("rentChart"),{
     type:"line",
     data:{
       labels:data.rentVsExpensesTrend.map(t=>"M"+t.month),
       datasets:[
-        {label:"Rent",data:data.rentVsExpensesTrend.map(t=>t.rent),
-         borderColor:"#2dd4bf",tension:.4},
-        {label:"Expenses",data:data.rentVsExpensesTrend.map(t=>t.expenses),
-         borderColor:"#f87171",tension:.4}
+        {label:"Rent",data:data.rentVsExpensesTrend.map(t=>t.rent),borderColor:"#2dd4bf",tension:.4},
+        {label:"Expenses",data:data.rentVsExpensesTrend.map(t=>t.expenses),borderColor:"#f87171",tension:.4}
       ]
     }
   });
 
-  employeeChart=new Chart(employeeChart=document.getElementById("employeeChart"),{
+  employeeChart=new Chart(document.getElementById("employeeChart"),{
     type:"bar",
     data:{
       labels:data.employeeTrend.map(t=>"M"+t.month),
@@ -387,22 +359,8 @@ function renderCharts(data){
 }
 
 function toggleTheme(){document.body.classList.toggle("light");}
-
-function showToast(msg){
-  toast.innerText=msg;
-  toast.style.display="block";
-  setTimeout(()=>toast.style.display="none",2000);
-}
-
-function exportPDF(){
-  html2pdf().from(document.getElementById("dashboardContent"))
-  .save("MK_Nexus_Report.pdf");
-}
-
-function logout(){
-  localStorage.removeItem("user");
-  window.location.href="index.html";
-}
+function logout(){localStorage.removeItem("user");window.location.href="index.html";}
+function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
 setInterval(loadData,60000);
 loadData();
