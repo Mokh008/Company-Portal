@@ -77,3 +77,69 @@ button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(45,212,191,0.3);
 }
+
+/* ===== LOADER ===== */
+
+.loader-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+
+.spinner{
+  width:60px;
+  height:60px;
+  border:5px solid rgba(255,255,255,.3);
+  border-top:5px solid var(--accent);
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+/* ===== WELCOME SCREEN ===== */
+
+.welcome-overlay{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#0b0f19,#0e1422);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:3000;
+  animation:fadeIn .6s ease forwards;
+}
+
+.welcome-content{
+  text-align:center;
+  animation:scaleIn .8s ease forwards;
+}
+
+.welcome-logo{
+  width:120px;
+  margin-bottom:25px;
+  filter:drop-shadow(0 0 25px rgba(45,212,191,.5));
+}
+
+.welcome-overlay h1{
+  margin:0;
+  font-size:32px;
+  letter-spacing:2px;
+}
+
+.welcome-overlay p{
+  margin-top:10px;
+  color:#94a3b8;
+}
+
+@keyframes scaleIn{
+  from{transform:scale(.8); opacity:0;}
+  to{transform:scale(1); opacity:1;}
+}
