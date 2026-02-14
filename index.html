@@ -9,13 +9,77 @@
 
 <div class="login-container">
   <div class="login-box">
-    <h2>Company Portal</h2>
+    <h2>MK Nexus Portal</h2>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
   </div>
 </div>
 
-<script src="app.js"></script>
+<!-- ===== LOADER ===== -->
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- ===== WELCOME SCREEN ===== -->
+<div id="welcomeScreen" class="welcome-overlay">
+  <div class="welcome-content">
+    <img src="assets/icons/mk-nexus.png" class="welcome-logo">
+    <h1>Welcome to MK Nexus</h1>
+    <p id="welcomeUser"></p>
+  </div>
+</div>
+
+<script>
+
+const API_URL = "PUT_YOUR_API_URL";
+
+async function login(){
+
+  document.getElementById("loader").style.display="flex";
+
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+
+  const response=await fetch(API_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"login",
+      email:email,
+      password:password
+    })
+  });
+
+  const result=await response.json();
+
+  document.getElementById("loader").style.display="none";
+
+  if(result.success){
+
+    localStorage.setItem("user",JSON.stringify(result.user));
+
+    showWelcomeScreen(result.user.name);
+
+  }else{
+    alert("Invalid credentials");
+  }
+}
+
+function showWelcomeScreen(name){
+
+  const screen=document.getElementById("welcomeScreen");
+
+  document.getElementById("welcomeUser").innerText =
+    `Hello ${name}`;
+
+  screen.style.display="flex";
+
+  setTimeout(()=>{
+    window.location.href="dashboard.html";
+  },2000);
+}
+
+</script>
+
 </body>
 </html>
