@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyHmC3AfwY-hppOdU4buKLhBlb8d115F-slEk3-DNmjomsLOJ1qQ3cWfg_bm2vu0cfx/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzw3WejGORdCkBdS7einEPMeEC0alCnBizk7ZHWcuZxHYoO6rRthcjRjxrkKLpM6Ffv/exec";
 
 async function login() {
   const email = document.getElementById("email").value;
