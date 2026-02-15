@@ -273,16 +273,26 @@ function addProject(title,link,icon){
   projectsSection.appendChild(div);
 }
 
+/* ====== تعديل الصلاحيات هنا فقط ====== */
+
 if(user.role==="engineer"){
   addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
   addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
 }
 
-if(user.role==="manager"||user.role==="admin"){
+if(user.role==="manager"){
   addProject("Attendance","https://mokh008.github.io/Attendance-Login/","🕒");
   addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
   addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
 }
+
+if(user.role==="admin" || user.role==="sector_manager"){
+  addProject("Attendance","https://mokh008.github.io/Attendance-Login/","🕒");
+  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
+  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
+}
+
+/* ====== نهاية تعديل الصلاحيات ====== */
 
 let rentChart, employeeChart;
 
@@ -306,8 +316,6 @@ function loadData(){
   })
   .catch(()=>{ hideLoader(); });
 }
-
-/* ====== تم التعديل هنا فقط ====== */
 
 function renderKPIs(kpis){
   kpiSection.innerHTML="";
@@ -339,8 +347,6 @@ function renderKPIs(kpis){
     kpiSection.appendChild(div);
   });
 }
-
-/* ====== نهاية التعديل ====== */
 
 function renderCharts(data){
 
