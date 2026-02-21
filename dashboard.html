@@ -201,39 +201,40 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;text-alig
   <div id="projectsSection" class="projects"></div>
   <div id="kpiSection" class="kpis"></div>
 
-  <!-- ✅ Custody Section -->
   <div id="custodySection"></div>
 
-  <!-- ✅ Supply KPIs -->
   <h2 class="section-title">Supply Overview</h2>
   <div id="supplyKPIs" class="kpis"></div>
 
-  <!-- ✅ Top 5 Tables -->
   <div id="top5Section"></div>
 
   <div class="charts">
+
     <div class="chart-card">
       <h3>Rent vs Expenses</h3>
       <canvas id="rentChart"></canvas>
     </div>
+
     <div class="chart-card">
       <h3>Employee Activity</h3>
       <canvas id="employeeChart"></canvas>
     </div>
-    <!-- ✅ Supply Chart -->
+
     <div class="chart-card">
       <h3>Quota vs Delivered Today</h3>
       <canvas id="supplyChart"></canvas>
-      <div class="chart-card">
-  <h3>Sugar % Today</h3>
-  <canvas id="sugarChart"></canvas>
-</div>
-
-<div class="chart-card">
-  <h3>Tare % Today</h3>
-  <canvas id="tareChart"></canvas>
-</div>
     </div>
+
+    <div class="chart-card">
+      <h3>Sugar % Today</h3>
+      <canvas id="sugarChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Tare % Today</h3>
+      <canvas id="tareChart"></canvas>
+    </div>
+
   </div>
 
 </div>
@@ -273,8 +274,6 @@ function addProject(title,link,icon){
   projectsSection.appendChild(div);
 }
 
-/* ====== صلاحيات كما هي بدون حذف ====== */
-
 if(user.role==="engineer"){
   addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
   addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
@@ -291,7 +290,7 @@ if(user.role==="admin" || user.role==="sector_manager"){
 }
 
 let rentChart, employeeChart, supplyChart, sugarChart, tareChart;
-  
+
 function currency(n){return new Intl.NumberFormat().format(n||0);}
 function showLoader(){loaderOverlay.style.display="flex";}
 function hideLoader(){loaderOverlay.style.display="none";}
@@ -315,71 +314,13 @@ function loadData(){
   .catch(()=>{ hideLoader(); });
 }
 
-function renderCustody(c){
-  if(!c) return;
-  const div=document.getElementById("custodySection");
-  div.innerHTML=`
-  <h2 class="section-title">Custody Control</h2>
-  <div class="kpis">
-    <div class="kpi-card"><div class="kpi-title">Operating</div><div class="kpi-value">${currency(c.operating)}</div></div>
-    <div class="kpi-card"><div class="kpi-title">Received</div><div class="kpi-value">${currency(c.received)}</div></div>
-    <div class="kpi-card"><div class="kpi-title">Difference (${c.status})</div><div class="kpi-value ${c.difference>=0?'healthy':'risk'}">${currency(c.difference)}</div></div>
-  </div>`;
-}
-
-function renderSupply(s){
-  if(!s) return;
-  const section=document.getElementById("supplyKPIs");
-  section.innerHTML="";
-  [
-    {t:"Total Quota Today",v:s.totalQuota},
-    {t:"Delivered Today",v:s.totalDelivered},
-    {t:"Avg Sugar %",v:s.avgSugar?.toFixed(2)},
-    {t:"Avg Impurity %",v:s.avgImpurity?.toFixed(2)}
-  ].forEach(i=>{
-    const div=document.createElement("div");
-    div.className="kpi-card";
-    div.innerHTML=`<div class="kpi-title">${i.t}</div>
-    <div class="kpi-value">${i.v||0}</div>`;
-    section.appendChild(div);
-  });
-}
-
-function renderTop5(t){
-  if(!t) return;
-
-  const section=document.getElementById("top5Section");
-
-  function build(title,data,type){
-    return `<h3>${title}</h3>
-      <table>
-        <tr><th>Engineer</th><th>${type}</th></tr>
-        ${data.map(d=>`
-          <tr>
-            <td>${d.engineer}</td>
-            <td>${
-              type==="Tons" ? d.tons :
-              type==="Sugar %" ? d.sugar :
-              d.impurity
-            }</td>
-          </tr>
-        `).join("")}
-      </table><br>`;
-  }
-
-  section.innerHTML=
-    build("Top 5 Tons",t.topTons||[],"Tons") +
-    build("Top 5 Sugar",t.topSugar||[],"Sugar %") +
-    build("Top 5 Tare",t.topImpurity||[],"Tare %");
-}
-
 function renderCharts(data){
 
   if(rentChart) rentChart.destroy();
   if(employeeChart) employeeChart.destroy();
   if(supplyChart) supplyChart.destroy();
   if(sugarChart) sugarChart.destroy();
-if(tareChart) tareChart.destroy();
+  if(tareChart) tareChart.destroy();
 
   rentChart=new Chart(document.getElementById("rentChart"),{
     type:"line",
@@ -396,11 +337,11 @@ if(tareChart) tareChart.destroy();
     type:"bar",
     data:{
       labels:data.employeeTrend.map(t=>"M"+t.month),
-      datasets:[
-        {label:"Active Employees",
-         data:data.employeeTrend.map(t=>t.activeEmployees),
-         backgroundColor:"#2dd4bf"}
-      ]
+      datasets:[{
+        label:"Active Employees",
+        data:data.employeeTrend.map(t=>t.activeEmployees),
+        backgroundColor:"#2dd4bf"
+      }]
     }
   });
 
@@ -409,69 +350,42 @@ if(tareChart) tareChart.destroy();
       type:"bar",
       data:{
         labels:["Quota","Delivered"],
-        datasets:[
-          {label:"Tons",
-           data:[data.supplySummary.totalQuota||0,data.supplySummary.totalDelivered||0],
-           backgroundColor:["#0ea5e9","#2dd4bf"]}
-        ]
+        datasets:[{
+          label:"Tons",
+          data:[data.supplySummary.totalQuota||0,data.supplySummary.totalDelivered||0],
+          backgroundColor:["#0ea5e9","#2dd4bf"]
+        }]
       }
     });
   }
-}
-if(data.supplyTop5){
 
-  sugarChart=new Chart(document.getElementById("sugarChart"),{
-    type:"bar",
-    data:{
-      labels:data.supplyTop5.topSugar.map(e=>e.engineer),
-      datasets:[{
-        label:"Sugar %",
-        data:data.supplyTop5.topSugar.map(e=>e.sugar),
-        backgroundColor:"#2dd4bf"
-      }]
-    }
-  });
+  if(data.supplyTop5){
 
-  tareChart=new Chart(document.getElementById("tareChart"),{
-    type:"bar",
-    data:{
-      labels:data.supplyTop5.topImpurity.map(e=>e.engineer),
-      datasets:[{
-        label:"Tare %",
-        data:data.supplyTop5.topImpurity.map(e=>e.impurity),
-        backgroundColor:"#f87171"
-      }]
-    }
-  });
+    sugarChart=new Chart(document.getElementById("sugarChart"),{
+      type:"bar",
+      data:{
+        labels:data.supplyTop5.topSugar.map(e=>e.engineer),
+        datasets:[{
+          label:"Sugar %",
+          data:data.supplyTop5.topSugar.map(e=>e.sugar),
+          backgroundColor:"#2dd4bf"
+        }]
+      }
+    });
 
-}
-function renderKPIs(kpis){
-  kpiSection.innerHTML="";
-  const change = kpis.monthlyChange || 0;
-  const isIncrease = change > 0;
-  const isDecrease = change < 0;
-  const badgeClass = isIncrease ? "risk" : isDecrease ? "healthy" : "";
-  const arrow = isIncrease ? "↑" : isDecrease ? "↓" : "";
-  const changeText = kpis.prevOperatingCost > 0
-    ? `${arrow} ${Math.abs(change).toFixed(1)}% vs Last Month`
-    : "No previous data";
+    tareChart=new Chart(document.getElementById("tareChart"),{
+      type:"bar",
+      data:{
+        labels:data.supplyTop5.topImpurity.map(e=>e.engineer),
+        datasets:[{
+          label:"Tare %",
+          data:data.supplyTop5.topImpurity.map(e=>e.impurity),
+          backgroundColor:"#f87171"
+        }]
+      }
+    });
 
-  [
-    {title:"Total Rent",value:kpis.totalRent},
-    {title:"Total Expenses",value:kpis.totalExpenses},
-    {title:"Total Operating Cost",value:kpis.totalOperatingCost}
-  ].forEach(i=>{
-    const div=document.createElement("div");
-    div.className="kpi-card";
-    div.innerHTML=`
-      <div class="kpi-title">${i.title}</div>
-      <div class="kpi-value">${currency(i.value)}</div>
-      ${i.title==="Total Operating Cost"
-        ? `<div class="badge ${badgeClass}">${changeText}</div>`
-        : ""}
-    `;
-    kpiSection.appendChild(div);
-  });
+  }
 }
 
 function toggleTheme(){document.body.classList.toggle("light");}
