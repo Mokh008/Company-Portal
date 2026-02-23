@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>MK Nexus SaaS Pro</title>
+<title>MK Nexus Enterprise</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -13,6 +13,7 @@
   --card:#121826;
   --accent:#2dd4bf;
   --danger:#f87171;
+  --warning:#facc15;
   --text:#f1f5f9;
   --muted:#94a3b8;
   --border:#1f2937;
@@ -60,20 +61,16 @@ body{
 .controls{
   display:flex;
   gap:10px;
-  align-items:center;
 }
-button, select{
+button{
   padding:6px 12px;
   border-radius:8px;
   border:1px solid var(--border);
   background:var(--card);
   color:var(--text);
   cursor:pointer;
-  transition:.2s;
 }
-button:hover{
-  border-color:var(--accent);
-}
+button:hover{border-color:var(--accent);}
 .projects{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -93,15 +90,6 @@ button:hover{
   transform:translateY(-8px) scale(1.03);
   border:1px solid var(--accent);
   box-shadow:0 25px 60px rgba(45,212,191,.35);
-}
-.project-icon{
-  font-size:52px;
-  margin-bottom:20px;
-}
-.project-card h3{
-  margin:0;
-  font-size:18px;
-  letter-spacing:1px;
 }
 .kpis{
   display:grid;
@@ -124,12 +112,15 @@ button:hover{
   margin-top:8px;
   font-weight:600;
 }
-.badge{
-  font-size:12px;
-  margin-top:6px;
+.section-title{margin:40px 0 15px;}
+.tabs{display:flex;gap:10px;margin-bottom:20px;}
+.tab-btn{
+  padding:8px 16px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  cursor:pointer;
 }
-.healthy{color:var(--accent);}
-.risk{color:var(--danger);}
+.tab-btn.active{border-color:var(--accent);}
 .charts{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
@@ -141,40 +132,18 @@ button:hover{
   border-radius:18px;
   border:1px solid var(--border);
 }
+table{width:100%;border-collapse:collapse;}
+th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 .loader-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;justify-content:center;align-items:center;z-index:2000;
 }
 .spinner{
-  width:70px;
-  height:70px;
-  border:6px solid rgba(255,255,255,.3);
-  border-top:6px solid var(--accent);
-  border-radius:50%;
+  width:70px;height:70px;border:6px solid rgba(255,255,255,.3);
+  border-top:6px solid var(--accent);border-radius:50%;
   animation:spin 1s linear infinite;
 }
-@keyframes spin{
-  to{transform:rotate(360deg);}
-}
-.toast{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  background:var(--card);
-  padding:12px 18px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  display:none;
-  z-index:3000;
-}
-table{width:100%;border-collapse:collapse;}
-th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;text-align:left;}
-.section-title{margin:40px 0 15px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 
@@ -186,114 +155,84 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;text-alig
 
 <div class="main" id="dashboardContent">
 
-  <div class="header">
-    <div id="userInfo"></div>
-    <div class="controls">
-      <select id="monthFilter">
-        <option value="">All Months</option>
-      </select>
-      <button onclick="toggleTheme()">Theme</button>
-      <button onclick="exportPDF()">PDF</button>
-      <button onclick="logout()">Logout</button>
-    </div>
+<div class="header">
+  <div id="userInfo"></div>
+  <div class="controls">
+    <button onclick="toggleTheme()">Theme</button>
+    <button onclick="exportPDF()">PDF</button>
+    <button onclick="logout()">Logout</button>
   </div>
+</div>
 
-  <div id="projectsSection" class="projects"></div>
-  <div id="kpiSection" class="kpis"></div>
+<div id="projectsSection" class="projects"></div>
+<div id="kpiSection" class="kpis"></div>
+<div id="custodySection"></div>
 
-  <div id="custodySection"></div>
+<h2 class="section-title">Supply Performance</h2>
 
-  <h2 class="section-title">Supply Overview</h2>
-  <div id="supplyKPIs" class="kpis"></div>
+<div class="tabs">
+  <div class="tab-btn active" onclick="switchTab('today',event)">Today</div>
+  <div class="tab-btn" onclick="switchTab('toDate',event)">To Date</div>
+</div>
 
-  <div id="top5Section"></div>
+<div id="supplyKPIs" class="kpis"></div>
+<div id="top5Section"></div>
 
-  <div class="charts">
+<h3 class="section-title">Sector Comparison (Admin Only)</h3>
+<div id="sectorSection" class="charts"></div>
 
-    <div class="chart-card">
-      <h3>Rent vs Expenses</h3>
-      <canvas id="rentChart"></canvas>
-    </div>
-
-    <div class="chart-card">
-      <h3>Employee Activity</h3>
-      <canvas id="employeeChart"></canvas>
-    </div>
-
-    <div class="chart-card">
-      <h3>Quota vs Delivered Today</h3>
-      <canvas id="supplyChart"></canvas>
-    </div>
-
-    <div class="chart-card">
-      <h3>Sugar % Today</h3>
-      <canvas id="sugarChart"></canvas>
-    </div>
-
-    <div class="chart-card">
-      <h3>Tare % Today</h3>
-      <canvas id="tareChart"></canvas>
-    </div>
-
+<div class="charts">
+  <div class="chart-card">
+    <h3>Rent vs Expenses</h3>
+    <canvas id="rentChart"></canvas>
   </div>
+  <div class="chart-card">
+    <h3>Employee Activity</h3>
+    <canvas id="employeeChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Plan vs Actual</h3>
+    <canvas id="supplyChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Sugar %</h3>
+    <canvas id="sugarChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Tare %</h3>
+    <canvas id="tareChart"></canvas>
+  </div>
+</div>
 
 </div>
 
-<div id="toast" class="toast"></div>
 <div id="loaderOverlay" class="loader-overlay">
-  <div class="spinner"></div>
+<div class="spinner"></div>
 </div>
 
 <script>
 
-const API_URL="https://script.google.com/macros/s/AKfycbxvofE7leNuz0eiWPszpcujdHNfMsocMOweYdsexQ0IbgI6tpanl0AZOAf81bPlu497/exec";
-
-const projectsSection = document.getElementById("projectsSection");
-const kpiSection = document.getElementById("kpiSection");
-const loaderOverlay = document.getElementById("loaderOverlay");
-
+const API_URL="https://script.google.com/macros/s/AKfycbyA76aRI5v3LpSE3DVbUHlctltSCAPK5TFLEKFYMNlisy0uhTQ3LZfsAXgUrHN3F2DK/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
-document.getElementById("userInfo").innerText=
-`${user.name} • ${user.role}`;
+document.getElementById("userInfo").innerText =
+`${user.name} • ${user.role} • ${user.sector||''}`;
 
-const monthSelect=document.getElementById("monthFilter");
-for(let i=1;i<=12;i++){
-  const opt=document.createElement("option");
-  opt.value=i;
-  opt.textContent="Month "+i;
-  monthSelect.appendChild(opt);
-}
-
-function addProject(title,link,icon){
-  const div=document.createElement("div");
-  div.className="project-card";
-  div.innerHTML=`<div class="project-icon">${icon}</div><h3>${title}</h3>`;
-  div.onclick=()=>window.open(link,"_blank");
-  projectsSection.appendChild(div);
-}
-
-if(user.role==="engineer"){
-  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
-  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
-}
-if(user.role==="manager"){
-  addProject("Attendance","https://mokh008.github.io/Attendance-Login/","🕒");
-  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
-  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
-}
-if(user.role==="admin" || user.role==="sector_manager"){
-  addProject("Attendance","https://mokh008.github.io/Attendance-Login/","🕒");
-  addProject("Expenses","https://mokh008.github.io/Expenses-System/","💰");
-  addProject("Rentals","https://mokh008.github.io/Rent-Payment-UI/","🏢");
-}
-
-let rentChart, employeeChart, supplyChart, sugarChart, tareChart;
+let currentTab="today";
+let rentChart,employeeChart,supplyChart,sugarChart,tareChart;
+let sectorCharts=[];
 
 function currency(n){return new Intl.NumberFormat().format(n||0);}
-function showLoader(){loaderOverlay.style.display="flex";}
-function hideLoader(){loaderOverlay.style.display="none";}
+function showLoader(){document.getElementById("loaderOverlay").style.display="flex";}
+function hideLoader(){document.getElementById("loaderOverlay").style.display="none";}
+
+function switchTab(tab,e){
+  currentTab=tab;
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  e.target.classList.add("active");
+  loadData();
+}
 
 function loadData(){
   showLoader();
@@ -303,15 +242,117 @@ function loadData(){
   })
   .then(res=>res.json())
   .then(data=>{
-    if(!data || !data.kpis){ hideLoader(); return; }
+    renderProjects();
     renderKPIs(data.kpis);
     renderCustody(data.custody);
-    renderSupply(data.supplySummary);
-    renderTop5(data.supplyTop5);
+    renderSupply(data.supplySummary[currentTab]);
+    renderTop5(data.supplyTop5[currentTab]);
+    renderSector(data.sectorComparison);
     renderCharts(data);
     hideLoader();
-  })
-  .catch(()=>{ hideLoader(); });
+  });
+}
+
+function renderProjects(){
+  const p=document.getElementById("projectsSection");
+  p.innerHTML="";
+  function add(title,link){
+    const d=document.createElement("div");
+    d.className="project-card";
+    d.innerHTML=`<h3>${title}</h3>`;
+    d.onclick=()=>window.open(link,"_blank");
+    p.appendChild(d);
+  }
+  add("Attendance","https://mokh008.github.io/Attendance-Login/");
+  add("Expenses","https://mokh008.github.io/Expenses-System/");
+  add("Rentals","https://mokh008.github.io/Rent-Payment-UI/");
+}
+
+function renderKPIs(k){
+  document.getElementById("kpiSection").innerHTML=`
+  <div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">${currency(k.totalRent)}</div></div>
+  <div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">${currency(k.totalExpenses)}</div></div>
+  <div class="kpi-card"><div class="kpi-title">Operating (Month)</div><div class="kpi-value">${currency(k.monthlyOperatingCost)}</div></div>`;
+}
+
+function renderCustody(c){
+  if(!c){document.getElementById("custodySection").innerHTML="";return;}
+  document.getElementById("custodySection").innerHTML=`
+  <div class="kpis">
+    <div class="kpi-card">
+      <div class="kpi-title">Custody Balance</div>
+      <div class="kpi-value">${currency(c.currentBalance)}</div>
+    </div>
+  </div>`;
+}
+
+function renderSupply(s){
+  const ach=s.totalQuota?((s.totalDelivered/s.totalQuota)*100).toFixed(1):0;
+  document.getElementById("supplyKPIs").innerHTML=`
+  <div class="kpi-card"><div class="kpi-title">Quota</div><div class="kpi-value">${s.totalQuota}</div></div>
+  <div class="kpi-card"><div class="kpi-title">Delivered</div><div class="kpi-value">${s.totalDelivered}</div></div>
+  <div class="kpi-card"><div class="kpi-title">Achievement %</div><div class="kpi-value">${ach}%</div></div>
+  <div class="kpi-card"><div class="kpi-title">Avg Sugar</div><div class="kpi-value">${s.avgSugar.toFixed(2)}%</div></div>
+  <div class="kpi-card"><div class="kpi-title">Avg Tare</div><div class="kpi-value">${s.avgTare.toFixed(2)}%</div></div>`;
+}
+
+function renderTop5(d){
+  let html="";
+  function table(title,rows,field){
+    let t=`<div class="kpi-card"><h4>${title}</h4><table>`;
+    rows.forEach(r=>t+=`<tr><td>${r.engineer}</td><td>${r[field]}</td></tr>`);
+    t+="</table></div>";
+    return t;
+  }
+  html+=table("Top 5 Ton",d.topTons,"tons");
+  html+=table("Top 5 Sugar",d.topSugar,"sugar");
+  html+=table("Top 5 Tare (Lowest)",d.topTare,"tare");
+  document.getElementById("top5Section").innerHTML=html;
+}
+
+function renderSector(sec){
+  const el=document.getElementById("sectorSection");
+  el.innerHTML="";
+  if(!sec || user.role!=="admin") return;
+
+  const s=sec[currentTab];
+
+  el.innerHTML=`
+  <div class="chart-card"><h4>Delivered</h4><canvas id="secDel"></canvas></div>
+  <div class="chart-card"><h4>Achievement %</h4><canvas id="secAch"></canvas></div>
+  <div class="chart-card"><h4>Avg Sugar</h4><canvas id="secSug"></canvas></div>
+  <div class="chart-card"><h4>Avg Tare</h4><canvas id="secTar"></canvas></div>`;
+
+  sectorCharts.forEach(c=>c.destroy());
+  sectorCharts=[];
+
+  sectorCharts.push(new Chart(document.getElementById("secDel"),{
+    type:"bar",
+    data:{labels:["Traditional","Mechanical"],
+    datasets:[{data:[s.traditional.delivered,s.mechanical.delivered],
+    backgroundColor:["#2dd4bf","#0ea5e9"]}]}
+  }));
+
+  sectorCharts.push(new Chart(document.getElementById("secAch"),{
+    type:"bar",
+    data:{labels:["Traditional","Mechanical"],
+    datasets:[{data:[s.traditional.achievement,s.mechanical.achievement],
+    backgroundColor:["#22c55e","#3b82f6"]}]}
+  }));
+
+  sectorCharts.push(new Chart(document.getElementById("secSug"),{
+    type:"bar",
+    data:{labels:["Traditional","Mechanical"],
+    datasets:[{data:[s.traditional.avgSugar,s.mechanical.avgSugar],
+    backgroundColor:["#2dd4bf","#0ea5e9"]}]}
+  }));
+
+  sectorCharts.push(new Chart(document.getElementById("secTar"),{
+    type:"bar",
+    data:{labels:["Traditional","Mechanical"],
+    datasets:[{data:[s.traditional.avgTare,s.mechanical.avgTare],
+    backgroundColor:["#f87171","#f97316"]}]}
+  }));
 }
 
 function renderCharts(data){
@@ -327,8 +368,8 @@ function renderCharts(data){
     data:{
       labels:data.rentVsExpensesTrend.map(t=>"M"+t.month),
       datasets:[
-        {label:"Rent",data:data.rentVsExpensesTrend.map(t=>t.rent),borderColor:"#2dd4bf",tension:.4},
-        {label:"Expenses",data:data.rentVsExpensesTrend.map(t=>t.expenses),borderColor:"#f87171",tension:.4}
+        {label:"Rent",data:data.rentVsExpensesTrend.map(t=>t.rent),borderColor:"#2dd4bf"},
+        {label:"Expenses",data:data.rentVsExpensesTrend.map(t=>t.expenses),borderColor:"#f87171"}
       ]
     }
   });
@@ -345,47 +386,28 @@ function renderCharts(data){
     }
   });
 
-  if(data.supplySummary){
-    supplyChart=new Chart(document.getElementById("supplyChart"),{
-      type:"bar",
-      data:{
-        labels:["Quota","Delivered"],
-        datasets:[{
-          label:"Tons",
-          data:[data.supplySummary.totalQuota||0,data.supplySummary.totalDelivered||0],
-          backgroundColor:["#0ea5e9","#2dd4bf"]
-        }]
-      }
-    });
-  }
+  const s=data.supplySummary[currentTab];
 
-  if(data.supplyTop5){
+  supplyChart=new Chart(document.getElementById("supplyChart"),{
+    type:"bar",
+    data:{labels:["Quota","Delivered"],
+    datasets:[{data:[s.totalQuota,s.totalDelivered],
+    backgroundColor:["#0ea5e9","#2dd4bf"]}]}
+  });
 
-    sugarChart=new Chart(document.getElementById("sugarChart"),{
-      type:"bar",
-      data:{
-        labels:data.supplyTop5.topSugar.map(e=>e.engineer),
-        datasets:[{
-          label:"Sugar %",
-          data:data.supplyTop5.topSugar.map(e=>e.sugar),
-          backgroundColor:"#2dd4bf"
-        }]
-      }
-    });
+  sugarChart=new Chart(document.getElementById("sugarChart"),{
+    type:"bar",
+    data:{labels:data.supplyTop5[currentTab].topSugar.map(e=>e.engineer),
+    datasets:[{data:data.supplyTop5[currentTab].topSugar.map(e=>e.sugar),
+    backgroundColor:"#2dd4bf"}]}
+  });
 
-    tareChart=new Chart(document.getElementById("tareChart"),{
-      type:"bar",
-      data:{
-        labels:data.supplyTop5.topImpurity.map(e=>e.engineer),
-        datasets:[{
-          label:"Tare %",
-          data:data.supplyTop5.topImpurity.map(e=>e.impurity),
-          backgroundColor:"#f87171"
-        }]
-      }
-    });
-
-  }
+  tareChart=new Chart(document.getElementById("tareChart"),{
+    type:"bar",
+    data:{labels:data.supplyTop5[currentTab].topTare.map(e=>e.engineer),
+    datasets:[{data:data.supplyTop5[currentTab].topTare.map(e=>e.tare),
+    backgroundColor:"#f87171"}]}
+  });
 }
 
 function toggleTheme(){document.body.classList.toggle("light");}
