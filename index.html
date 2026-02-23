@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Company Portal</title>
+  <title>MK Nexus Portal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,9 +10,9 @@
 <div class="login-container">
   <div class="login-box">
     <h2>MK Nexus Portal</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <input type="email" id="email" placeholder="Email" autocomplete="username">
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn" onclick="login()">Login</button>
   </div>
 </div>
 
@@ -32,51 +32,111 @@
 
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbymL8UUaJbuHBpM42_PnopM8Kkp0q-NPo8EaBCTfF9Mas2jHwzxNFBH6Oie0vXg_hPr/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyA76aRI5v3LpSE3DVbUHlctltSCAPK5TFLEKFYMNlisy0uhTQ3LZfsAXgUrHN3F2DK/exec";
 
+const loader = document.getElementById("loader");
+const loginBtn = document.getElementById("loginBtn");
+
+/* ============================= */
+/* ===== Auto Clear Session ==== */
+/* ============================= */
+try {
+  const existingUser = JSON.parse(localStorage.getItem("user"));
+  if(existingUser && !existingUser.role){
+    localStorage.removeItem("user");
+  }
+} catch(e){
+  localStorage.removeItem("user");
+}
+
+/* ============================= */
+/* ===== Enter Key Login ======= */
+/* ============================= */
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    login();
+  }
+});
+
+/* ============================= */
+/* ===== LOGIN FUNCTION ======== */
+/* ============================= */
 async function login(){
 
-  document.getElementById("loader").style.display="flex";
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  const email=document.getElementById("email").value;
-  const password=document.getElementById("password").value;
+  if(!email || !password){
+    alert("Please enter email and password");
+    return;
+  }
 
-  const response=await fetch(API_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"login",
-      email:email,
-      password:password
-    })
-  });
+  loginBtn.disabled = true;
+  loader.style.display = "flex";
 
-  const result=await response.json();
+  try{
 
-  document.getElementById("loader").style.display="none";
+    const response = await fetch(API_URL,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"login",
+        email:email,
+        password:password
+      })
+    });
 
-  if(result.success){
+    if(!response.ok){
+      throw new Error("Server error");
+    }
 
-    localStorage.setItem("user",JSON.stringify(result.user));
+    const result = await response.json();
 
-    showWelcomeScreen(result.user.name);
+    loader.style.display = "none";
+    loginBtn.disabled = false;
 
-  }else{
-    alert("Invalid credentials");
+    if(result.success && result.user){
+
+      // ===== Data Hardening =====
+      if(!result.user.role){
+        alert("User role not defined");
+        return;
+      }
+
+      if(!result.user.sector){
+        result.user.sector = "";
+      }
+
+      localStorage.setItem("user", JSON.stringify(result.user));
+      showWelcomeScreen(result.user.name);
+
+    }else{
+      alert("Invalid credentials");
+    }
+
+  }catch(error){
+
+    loader.style.display = "none";
+    loginBtn.disabled = false;
+    alert("Connection error. Please try again.");
+
   }
 }
 
+/* ============================= */
+/* ===== Welcome Animation ===== */
+/* ============================= */
 function showWelcomeScreen(name){
 
-  const screen=document.getElementById("welcomeScreen");
+  const screen = document.getElementById("welcomeScreen");
 
   document.getElementById("welcomeUser").innerText =
     `Hello ${name}`;
 
-  screen.style.display="flex";
+  screen.style.display = "flex";
 
   setTimeout(()=>{
-    window.location.href="dashboard.html";
-  },2000);
+    window.location.href = "dashboard.html";
+  },1500);
 }
 
 </script>
