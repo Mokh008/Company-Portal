@@ -38,7 +38,7 @@ async function login(){
     const response = await fetch(API_URL,{
       method:"POST",
       headers:{
-        "Content-Type":"application/json"
+        "Content-Type":"text/plain;charset=utf-8"
       },
       body:JSON.stringify({
         action:"login",
@@ -46,6 +46,10 @@ async function login(){
         password:password
       })
     });
+
+    if(!response.ok){
+      throw new Error("Server error");
+    }
 
     const result = await response.json();
 
