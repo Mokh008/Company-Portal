@@ -56,12 +56,9 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:40px;
+  margin-bottom:30px;
 }
-.controls{
-  display:flex;
-  gap:10px;
-}
+.controls{display:flex;gap:10px;}
 button{
   padding:6px 12px;
   border-radius:8px;
@@ -71,6 +68,14 @@ button{
   cursor:pointer;
 }
 button:hover{border-color:var(--accent);}
+select{
+  width:100%;
+  padding:6px;
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--border);
+}
 .projects{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -102,16 +107,10 @@ button:hover{border-color:var(--accent);}
   padding:22px;
   border-radius:18px;
   border:1px solid var(--border);
+  transition:.3s;
 }
-.kpi-title{
-  font-size:13px;
-  color:var(--muted);
-}
-.kpi-value{
-  font-size:24px;
-  margin-top:8px;
-  font-weight:600;
-}
+.kpi-title{font-size:13px;color:var(--muted);}
+.kpi-value{font-size:24px;margin-top:8px;font-weight:600;}
 .section-title{margin:40px 0 15px;}
 .tabs{display:flex;gap:10px;margin-bottom:20px;}
 .tab-btn{
@@ -134,6 +133,9 @@ button:hover{border-color:var(--accent);}
 }
 table{width:100%;border-collapse:collapse;}
 th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
+.rank1{color:#facc15;font-weight:bold;}
+.rank2{color:#cbd5e1;}
+.rank3{color:#f87171;}
 .loader-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);
   display:none;justify-content:center;align-items:center;z-index:2000;
@@ -164,6 +166,25 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 
+<!-- FILTERS -->
+<div class="kpis">
+  <div class="kpi-card">
+    <div class="kpi-title">Month</div>
+    <select id="monthFilter" onchange="loadData()">
+      <option value="">All</option>
+      ${[...Array(12)].map((_,i)=>`<option value="${i+1}">M${i+1}</option>`)}
+    </select>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-title">Sector</div>
+    <select id="sectorFilter" onchange="loadData()">
+      <option value="">All</option>
+      <option value="Traditional">Traditional</option>
+      <option value="Mechanical">Mechanical</option>
+    </select>
+  </div>
+</div>
+
 <div id="projectsSection" class="projects"></div>
 <div id="kpiSection" class="kpis"></div>
 <div id="custodySection"></div>
@@ -176,32 +197,17 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <div id="supplyKPIs" class="kpis"></div>
-<div id="top5Section"></div>
+<div id="top5Section" class="kpis"></div>
 
 <h3 class="section-title">Sector Comparison (Admin Only)</h3>
 <div id="sectorSection" class="charts"></div>
 
 <div class="charts">
-  <div class="chart-card">
-    <h3>Rent vs Expenses</h3>
-    <canvas id="rentChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Employee Activity</h3>
-    <canvas id="employeeChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Plan vs Actual</h3>
-    <canvas id="supplyChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Sugar %</h3>
-    <canvas id="sugarChart"></canvas>
-  </div>
-  <div class="chart-card">
-    <h3>Tare %</h3>
-    <canvas id="tareChart"></canvas>
-  </div>
+  <div class="chart-card"><h3>Rent vs Expenses</h3><canvas id="rentChart"></canvas></div>
+  <div class="chart-card"><h3>Employee Activity</h3><canvas id="employeeChart"></canvas></div>
+  <div class="chart-card"><h3>Plan vs Actual</h3><canvas id="supplyChart"></canvas></div>
+  <div class="chart-card"><h3>Sugar %</h3><canvas id="sugarChart"></canvas></div>
+  <div class="chart-card"><h3>Tare %</h3><canvas id="tareChart"></canvas></div>
 </div>
 
 </div>
@@ -212,7 +218,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 
 <script>
 
-const API_URL="https://script.google.com/macros/s/AKfycbz0SjIxfnQnPVt0wjmR1FGTnrJq0mVayH2iyPURUtCwnI81r0_bOW64G_l3vEB-5CF4/exec";
+const API_URL="YOUR_SCRIPT_URL";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -235,10 +241,19 @@ function switchTab(tab,e){
 }
 
 function loadData(){
+
   showLoader();
+
+  const month=document.getElementById("monthFilter").value;
+  const sector=document.getElementById("sectorFilter").value;
+
   fetch(API_URL,{
     method:"POST",
-    body:JSON.stringify({action:"analytics",user:user})
+    body:JSON.stringify({
+      action:"analytics",
+      user:user,
+      filters:{month,sector}
+    })
   })
   .then(res=>res.json())
   .then(data=>{
@@ -300,7 +315,10 @@ function renderTop5(d){
   let html="";
   function table(title,rows,field){
     let t=`<div class="kpi-card"><h4>${title}</h4><table>`;
-    rows.forEach(r=>t+=`<tr><td>${r.engineer}</td><td>${r[field]}</td></tr>`);
+    rows.forEach((r,i)=>{
+      let cls=i===0?"rank1":i===1?"rank2":i===2?"rank3":"";
+      t+=`<tr class="${cls}"><td>${i+1}. ${r.engineer}</td><td>${r[field].toFixed(2)}</td></tr>`;
+    });
     t+="</table></div>";
     return t;
   }
@@ -308,106 +326,6 @@ function renderTop5(d){
   html+=table("Top 5 Sugar",d.topSugar,"sugar");
   html+=table("Top 5 Tare (Lowest)",d.topTare,"tare");
   document.getElementById("top5Section").innerHTML=html;
-}
-
-function renderSector(sec){
-  const el=document.getElementById("sectorSection");
-  el.innerHTML="";
-  if(!sec || user.role!=="admin") return;
-
-  const s=sec[currentTab];
-
-  el.innerHTML=`
-  <div class="chart-card"><h4>Delivered</h4><canvas id="secDel"></canvas></div>
-  <div class="chart-card"><h4>Achievement %</h4><canvas id="secAch"></canvas></div>
-  <div class="chart-card"><h4>Avg Sugar</h4><canvas id="secSug"></canvas></div>
-  <div class="chart-card"><h4>Avg Tare</h4><canvas id="secTar"></canvas></div>`;
-
-  sectorCharts.forEach(c=>c.destroy());
-  sectorCharts=[];
-
-  sectorCharts.push(new Chart(document.getElementById("secDel"),{
-    type:"bar",
-    data:{labels:["Traditional","Mechanical"],
-    datasets:[{data:[s.traditional.delivered,s.mechanical.delivered],
-    backgroundColor:["#2dd4bf","#0ea5e9"]}]}
-  }));
-
-  sectorCharts.push(new Chart(document.getElementById("secAch"),{
-    type:"bar",
-    data:{labels:["Traditional","Mechanical"],
-    datasets:[{data:[s.traditional.achievement,s.mechanical.achievement],
-    backgroundColor:["#22c55e","#3b82f6"]}]}
-  }));
-
-  sectorCharts.push(new Chart(document.getElementById("secSug"),{
-    type:"bar",
-    data:{labels:["Traditional","Mechanical"],
-    datasets:[{data:[s.traditional.avgSugar,s.mechanical.avgSugar],
-    backgroundColor:["#2dd4bf","#0ea5e9"]}]}
-  }));
-
-  sectorCharts.push(new Chart(document.getElementById("secTar"),{
-    type:"bar",
-    data:{labels:["Traditional","Mechanical"],
-    datasets:[{data:[s.traditional.avgTare,s.mechanical.avgTare],
-    backgroundColor:["#f87171","#f97316"]}]}
-  }));
-}
-
-function renderCharts(data){
-
-  if(rentChart) rentChart.destroy();
-  if(employeeChart) employeeChart.destroy();
-  if(supplyChart) supplyChart.destroy();
-  if(sugarChart) sugarChart.destroy();
-  if(tareChart) tareChart.destroy();
-
-  rentChart=new Chart(document.getElementById("rentChart"),{
-    type:"line",
-    data:{
-      labels:data.rentVsExpensesTrend.map(t=>"M"+t.month),
-      datasets:[
-        {label:"Rent",data:data.rentVsExpensesTrend.map(t=>t.rent),borderColor:"#2dd4bf"},
-        {label:"Expenses",data:data.rentVsExpensesTrend.map(t=>t.expenses),borderColor:"#f87171"}
-      ]
-    }
-  });
-
-  employeeChart=new Chart(document.getElementById("employeeChart"),{
-    type:"bar",
-    data:{
-      labels:data.employeeTrend.map(t=>"M"+t.month),
-      datasets:[{
-        label:"Active Employees",
-        data:data.employeeTrend.map(t=>t.activeEmployees),
-        backgroundColor:"#2dd4bf"
-      }]
-    }
-  });
-
-  const s=data.supplySummary[currentTab];
-
-  supplyChart=new Chart(document.getElementById("supplyChart"),{
-    type:"bar",
-    data:{labels:["Quota","Delivered"],
-    datasets:[{data:[s.totalQuota,s.totalDelivered],
-    backgroundColor:["#0ea5e9","#2dd4bf"]}]}
-  });
-
-  sugarChart=new Chart(document.getElementById("sugarChart"),{
-    type:"bar",
-    data:{labels:data.supplyTop5[currentTab].topSugar.map(e=>e.engineer),
-    datasets:[{data:data.supplyTop5[currentTab].topSugar.map(e=>e.sugar),
-    backgroundColor:"#2dd4bf"}]}
-  });
-
-  tareChart=new Chart(document.getElementById("tareChart"),{
-    type:"bar",
-    data:{labels:data.supplyTop5[currentTab].topTare.map(e=>e.engineer),
-    datasets:[{data:data.supplyTop5[currentTab].topTare.map(e=>e.tare),
-    backgroundColor:"#f87171"}]}
-  });
 }
 
 function toggleTheme(){document.body.classList.toggle("light");}
