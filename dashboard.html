@@ -256,14 +256,16 @@ function loadData(){
   const sector=document.getElementById("sectorFilter").value;
 
   fetch(API_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      action:"analytics",
-      user:user,
-      filters:{month,sector}
-    })
+  method:"POST",
+  headers:{
+    "Content-Type":"text/plain;charset=utf-8"
+  },
+  body:JSON.stringify({
+    action:"analytics",
+    user:user,
+    filters:{month,sector}
   })
+})
   .then(res=>res.json())
   .then(data=>{
     if(!data) return;
