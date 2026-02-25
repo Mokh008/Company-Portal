@@ -107,7 +107,6 @@ select{
   padding:22px;
   border-radius:18px;
   border:1px solid var(--border);
-  transition:.3s;
 }
 .kpi-title{font-size:13px;color:var(--muted);}
 .kpi-value{font-size:24px;margin-top:8px;font-weight:600;}
@@ -142,7 +141,8 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 }
 .spinner{
   width:70px;height:70px;border:6px solid rgba(255,255,255,.3);
-  border-top:6px solid var(--accent);border-radius:50%;
+  border-top:6px solid var(--accent);
+  border-radius:50%;
   animation:spin 1s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -172,7 +172,18 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
     <div class="kpi-title">Month</div>
     <select id="monthFilter" onchange="loadData()">
       <option value="">All</option>
-      ${[...Array(12)].map((_,i)=>`<option value="${i+1}">M${i+1}</option>`)}
+      <option value="1">Jan</option>
+      <option value="2">Feb</option>
+      <option value="3">Mar</option>
+      <option value="4">Apr</option>
+      <option value="5">May</option>
+      <option value="6">Jun</option>
+      <option value="7">Jul</option>
+      <option value="8">Aug</option>
+      <option value="9">Sep</option>
+      <option value="10">Oct</option>
+      <option value="11">Nov</option>
+      <option value="12">Dec</option>
     </select>
   </div>
   <div class="kpi-card">
@@ -217,13 +228,12 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <script>
-
 const API_URL="https://script.google.com/macros/s/AKfycbwP4t3O8eWDgaN4mNXK87P2jZmg0wVkDiFjrps-ho_wXhM2kGYZ9_gW8Mc4CRh7gbsV/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
 document.getElementById("userInfo").innerText =
-`${user.name} • ${user.role} • ${user.sector||''}`;
+user.name+" • "+user.role+" • "+(user.sector||"");
 
 let currentTab="today";
 let rentChart,employeeChart,supplyChart,sugarChart,tareChart;
@@ -241,14 +251,13 @@ function switchTab(tab,e){
 }
 
 function loadData(){
-
   showLoader();
-
   const month=document.getElementById("monthFilter").value;
   const sector=document.getElementById("sectorFilter").value;
 
   fetch(API_URL,{
     method:"POST",
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
       action:"analytics",
       user:user,
@@ -257,14 +266,19 @@ function loadData(){
   })
   .then(res=>res.json())
   .then(data=>{
+    if(!data) return;
     renderProjects();
-    renderKPIs(data.kpis);
-    renderCustody(data.custody);
-    renderSupply(data.supplySummary[currentTab]);
-    renderTop5(data.supplyTop5[currentTab]);
-    renderSector(data.sectorComparison);
-    renderCharts(data);
+    if(data.kpis) renderKPIs(data.kpis);
+    if(data.custody) renderCustody(data.custody);
+    if(data.supplySummary) renderSupply(data.supplySummary[currentTab]);
+    if(data.supplyTop5) renderTop5(data.supplyTop5[currentTab]);
+    if(data.sectorComparison) renderSector(data.sectorComparison);
+    if(data.rentVsExpensesTrend) renderCharts(data);
     hideLoader();
+  })
+  .catch(()=>{
+    hideLoader();
+    alert("Connection error. Please try again.");
   });
 }
 
@@ -274,7 +288,7 @@ function renderProjects(){
   function add(title,link){
     const d=document.createElement("div");
     d.className="project-card";
-    d.innerHTML=`<h3>${title}</h3>`;
+    d.innerHTML="<h3>"+title+"</h3>";
     d.onclick=()=>window.open(link,"_blank");
     p.appendChild(d);
   }
@@ -284,42 +298,36 @@ function renderProjects(){
 }
 
 function renderKPIs(k){
-  document.getElementById("kpiSection").innerHTML=`
-  <div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">${currency(k.totalRent)}</div></div>
-  <div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">${currency(k.totalExpenses)}</div></div>
-  <div class="kpi-card"><div class="kpi-title">Operating (Month)</div><div class="kpi-value">${currency(k.monthlyOperatingCost)}</div></div>`;
+  document.getElementById("kpiSection").innerHTML=
+  '<div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">'+currency(k.totalRent)+'</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">'+currency(k.totalExpenses)+'</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Operating (Month)</div><div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div></div>';
 }
 
 function renderCustody(c){
-  if(!c){document.getElementById("custodySection").innerHTML="";return;}
-  document.getElementById("custodySection").innerHTML=`
-  <div class="kpis">
-    <div class="kpi-card">
-      <div class="kpi-title">Custody Balance</div>
-      <div class="kpi-value">${currency(c.currentBalance)}</div>
-    </div>
-  </div>`;
+  document.getElementById("custodySection").innerHTML=
+  '<div class="kpis"><div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(c.currentBalance)+'</div></div></div>';
 }
 
 function renderSupply(s){
   const ach=s.totalQuota?((s.totalDelivered/s.totalQuota)*100).toFixed(1):0;
-  document.getElementById("supplyKPIs").innerHTML=`
-  <div class="kpi-card"><div class="kpi-title">Quota</div><div class="kpi-value">${s.totalQuota}</div></div>
-  <div class="kpi-card"><div class="kpi-title">Delivered</div><div class="kpi-value">${s.totalDelivered}</div></div>
-  <div class="kpi-card"><div class="kpi-title">Achievement %</div><div class="kpi-value">${ach}%</div></div>
-  <div class="kpi-card"><div class="kpi-title">Avg Sugar</div><div class="kpi-value">${s.avgSugar.toFixed(2)}%</div></div>
-  <div class="kpi-card"><div class="kpi-title">Avg Tare</div><div class="kpi-value">${s.avgTare.toFixed(2)}%</div></div>`;
+  document.getElementById("supplyKPIs").innerHTML=
+  '<div class="kpi-card"><div class="kpi-title">Quota</div><div class="kpi-value">'+s.totalQuota+'</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Delivered</div><div class="kpi-value">'+s.totalDelivered+'</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Achievement %</div><div class="kpi-value">'+ach+'%</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Avg Sugar</div><div class="kpi-value">'+s.avgSugar.toFixed(2)+'%</div></div>'+
+  '<div class="kpi-card"><div class="kpi-title">Avg Tare</div><div class="kpi-value">'+s.avgTare.toFixed(2)+'%</div></div>';
 }
 
 function renderTop5(d){
   let html="";
   function table(title,rows,field){
-    let t=`<div class="kpi-card"><h4>${title}</h4><table>`;
+    let t='<div class="kpi-card"><h4>'+title+'</h4><table>';
     rows.forEach((r,i)=>{
       let cls=i===0?"rank1":i===1?"rank2":i===2?"rank3":"";
-      t+=`<tr class="${cls}"><td>${i+1}. ${r.engineer}</td><td>${r[field].toFixed(2)}</td></tr>`;
+      t+='<tr class="'+cls+'"><td>'+(i+1)+'. '+r.engineer+'</td><td>'+r[field].toFixed(2)+'</td></tr>';
     });
-    t+="</table></div>";
+    t+='</table></div>';
     return t;
   }
   html+=table("Top 5 Ton",d.topTons,"tons");
@@ -328,13 +336,18 @@ function renderTop5(d){
   document.getElementById("top5Section").innerHTML=html;
 }
 
+function renderSector(sec){
+  if(user.role!=="admin") return;
+}
+
+function renderCharts(data){}
+
 function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
-setInterval(loadData,60000);
 loadData();
-
+setInterval(loadData,60000);
 </script>
 
 </body>
