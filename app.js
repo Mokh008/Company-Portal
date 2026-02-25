@@ -3,9 +3,6 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwP4t3O8eWDgaN4mNXK87P2
 const loader = document.getElementById("loader");
 const loginBtn = document.getElementById("loginBtn");
 
-/* ============================= */
-/* ===== Session Hardening ===== */
-/* ============================= */
 (function(){
   try{
     const existingUser = JSON.parse(localStorage.getItem("user"));
@@ -17,18 +14,12 @@ const loginBtn = document.getElementById("loginBtn");
   }
 })();
 
-/* ============================= */
-/* ===== Enter Key Support ===== */
-/* ============================= */
 document.addEventListener("keydown", function(e){
   if(e.key === "Enter"){
     login();
   }
 });
 
-/* ============================= */
-/* ===== LOGIN FUNCTION ======== */
-/* ============================= */
 async function login(){
 
   const email = document.getElementById("email").value.trim();
@@ -39,13 +30,16 @@ async function login(){
     return;
   }
 
-  if(loginBtn) loginBtn.disabled = true;
-  if(loader) loader.style.display = "flex";
+  loginBtn.disabled = true;
+  loader.style.display = "flex";
 
   try{
 
     const response = await fetch(API_URL,{
       method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
       body:JSON.stringify({
         action:"login",
         email:email,
@@ -53,34 +47,22 @@ async function login(){
       })
     });
 
-    if(!response.ok){
-      throw new Error("Server error");
-    }
-
     const result = await response.json();
 
-    if(loader) loader.style.display = "none";
-    if(loginBtn) loginBtn.disabled = false;
+    loader.style.display = "none";
+    loginBtn.disabled = false;
 
     if(result.success && result.user){
 
-      /* ===== Data Validation ===== */
-
       if(!result.user.role){
-        alert("User role not defined. Contact admin.");
+        alert("User role not defined.");
         return;
       }
 
-      if(!result.user.sector){
-        result.user.sector = "";
-      }
-
-      if(!result.user.department){
-        result.user.department = "";
-      }
+      if(!result.user.sector) result.user.sector="";
+      if(!result.user.department) result.user.department="";
 
       localStorage.setItem("user", JSON.stringify(result.user));
-
       window.location.href = "dashboard.html";
 
     }else{
@@ -88,11 +70,8 @@ async function login(){
     }
 
   }catch(error){
-
-    if(loader) loader.style.display = "none";
-    if(loginBtn) loginBtn.disabled = false;
-
+    loader.style.display = "none";
+    loginBtn.disabled = false;
     alert("Connection error. Please try again.");
-
   }
 }
