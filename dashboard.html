@@ -258,16 +258,13 @@ function loadData(){
   const sector = document.getElementById("sectorFilter").value;
 
   fetch(API_URL,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      action:"analytics",
-      user:user,
-      filters:{ month, sector }
-    })
+  method:"POST",
+  body: JSON.stringify({
+    action:"analytics",
+    user:user,
+    filters:{ month, sector }
   })
+})
   .then(res => {
     if(!res.ok){
       throw new Error("Network response was not ok");
