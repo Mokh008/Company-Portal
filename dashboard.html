@@ -410,23 +410,55 @@ function renderSupply(data){
 
   `;
 }
-function renderTop5(d){
-  let html="";
-  function table(title,rows,field){
-    let t='<div class="kpi-card"><h4>'+title+'</h4><table>';
-    rows.forEach((r,i)=>{
-      let cls=i===0?"rank1":i===1?"rank2":i===2?"rank3":"";
-      t+='<tr class="'+cls+'"><td>'+(i+1)+'. '+r.engineer+'</td><td>'+r[field].toFixed(2)+'</td></tr>';
-    });
-    t+='</table></div>';
-    return t;
-  }
-  html+=table("Top 5 Ton",d.topTons,"tons");
-  html+=table("Top 5 Sugar",d.topSugar,"sugar");
-  html+=table("Top 5 Tare (Lowest)",d.topTare,"tare");
-  document.getElementById("top5Section").innerHTML=html;
-}
+function renderTop5(data){
 
+  if(!data || !data.today || !data.toDate) return;
+
+  function buildTable(title, rows, field){
+
+    if(!rows || !rows.length) return "";
+
+    let html = `
+      <div class="kpi-card">
+        <h4>${title}</h4>
+        <table>
+    `;
+
+    rows.forEach((r,i)=>{
+      let cls = i===0 ? "rank1" :
+                i===1 ? "rank2" :
+                i===2 ? "rank3" : "";
+
+      html += `
+        <tr class="${cls}">
+          <td>${i+1}. ${r.engineer}</td>
+          <td>${(r[field] || 0).toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    html += "</table></div>";
+
+    return html;
+  }
+
+  const today = data.today;
+  const toDate = data.toDate;
+
+  let html = "";
+
+  // Today
+  html += buildTable("Top 5 Ton (Today)", today.topTons, "tons");
+  html += buildTable("Top 5 Sugar (Today)", today.topSugar, "sugar");
+  html += buildTable("Top 5 Tare (Today)", today.topTare, "tare");
+
+  // To Date
+  html += buildTable("Top 5 Ton (To Date)", toDate.topTons, "tons");
+  html += buildTable("Top 5 Sugar (To Date)", toDate.topSugar, "sugar");
+  html += buildTable("Top 5 Tare (To Date)", toDate.topTare, "tare");
+
+  document.getElementById("top5Section").innerHTML = html;
+}
 function renderSector(sec){
   if(user.role!=="admin") return;
 }
