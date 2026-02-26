@@ -251,39 +251,65 @@ function switchTab(tab,e){
 }
 
 function loadData(){
+
   showLoader();
-  const month=document.getElementById("monthFilter").value;
-  const sector=document.getElementById("sectorFilter").value;
+
+  const month = document.getElementById("monthFilter").value;
+  const sector = document.getElementById("sectorFilter").value;
 
   fetch(API_URL,{
-  method:"POST",
-  headers:{
-    "Content-Type":"text/plain;charset=utf-8"
-  },
-  body:JSON.stringify({
-    action:"analytics",
-    user:user,
-    filters:{month,sector}
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      action:"analytics",
+      user:user,
+      filters:{ month, sector }
+    })
   })
-})
-  .then(res=>res.json())
-  .then(data=>{
-    if(!data) return;
+  .then(res => {
+    if(!res.ok){
+      throw new Error("Network response was not ok");
+    }
+    return res.json();
+  })
+  .then(data => {
+
+    console.log("API Response:", data); // مهم عشان تشوف بيرجع ايه
+
+    if(!data || data.success === false){
+      throw new Error(data?.error || "Invalid API response");
+    }
+
     renderProjects();
-    if(data.kpis) renderKPIs(data.kpis);
-    if(data.custody) renderCustody(data.custody);
-    if(data.supplySummary) renderSupply(data.supplySummary[currentTab]);
-    if(data.supplyTop5) renderTop5(data.supplyTop5[currentTab]);
-    if(data.sectorComparison) renderSector(data.sectorComparison);
-    if(data.rentVsExpensesTrend) renderCharts(data);
+
+    if(data.kpis)
+      renderKPIs(data.kpis);
+
+    if(data.custody)
+      renderCustody(data.custody);
+
+    if(data.supplySummary)
+      renderSupply(data.supplySummary[currentTab]);
+
+    if(data.supplyTop5)
+      renderTop5(data.supplyTop5[currentTab]);
+
+    if(data.sectorComparison)
+      renderSector(data.sectorComparison);
+
+    if(data.rentVsExpensesTrend)
+      renderCharts(data);
+
     hideLoader();
   })
-  .catch(()=>{
+  .catch(err=>{
+    console.error("Fetch Error:", err);
     hideLoader();
-    alert("Connection error. Please try again.");
+    alert("Connection error: " + err.message);
   });
 }
-
 function renderProjects(){
   const p=document.getElementById("projectsSection");
   p.innerHTML="";
