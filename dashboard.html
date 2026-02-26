@@ -341,16 +341,75 @@ function renderCustody(c){
   '<div class="kpis"><div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(c.currentBalance)+'</div></div></div>';
 }
 
-function renderSupply(s){
-  const ach=s.totalQuota?((s.totalDelivered/s.totalQuota)*100).toFixed(1):0;
-  document.getElementById("supplyKPIs").innerHTML=
-  '<div class="kpi-card"><div class="kpi-title">Quota</div><div class="kpi-value">'+s.totalQuota+'</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Delivered</div><div class="kpi-value">'+s.totalDelivered+'</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Achievement %</div><div class="kpi-value">'+ach+'%</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Avg Sugar</div><div class="kpi-value">'+s.avgSugar.toFixed(2)+'%</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Avg Tare</div><div class="kpi-value">'+s.avgTare.toFixed(2)+'%</div></div>';
-}
+function renderSupply(data){
 
+  if(!data || !data.today || !data.toDate) return;
+
+  const today = data.today;
+  const toDate = data.toDate;
+
+  const achToday = today.totalQuota 
+      ? ((today.totalDelivered / today.totalQuota) * 100).toFixed(1)
+      : 0;
+
+  const achToDate = toDate.totalQuota 
+      ? ((toDate.totalDelivered / toDate.totalQuota) * 100).toFixed(1)
+      : 0;
+
+  document.getElementById("supplyKPIs").innerHTML = `
+
+    <div class="kpi-card">
+      <div class="kpi-title">Quota (Today)</div>
+      <div class="kpi-value">${today.totalQuota || 0}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Delivered (Today)</div>
+      <div class="kpi-value">${today.totalDelivered || 0}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Achievement % (Today)</div>
+      <div class="kpi-value">${achToday}%</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Avg Sugar (Today)</div>
+      <div class="kpi-value">${(today.avgSugar || 0).toFixed(2)}%</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Avg Tare (Today)</div>
+      <div class="kpi-value">${(today.avgTare || 0).toFixed(2)}%</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Quota (To Date)</div>
+      <div class="kpi-value">${toDate.totalQuota || 0}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Delivered (To Date)</div>
+      <div class="kpi-value">${toDate.totalDelivered || 0}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Achievement % (To Date)</div>
+      <div class="kpi-value">${achToDate}%</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Avg Sugar (To Date)</div>
+      <div class="kpi-value">${(toDate.avgSugar || 0).toFixed(2)}%</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">Avg Tare (To Date)</div>
+      <div class="kpi-value">${(toDate.avgTare || 0).toFixed(2)}%</div>
+    </div>
+
+  `;
+}
 function renderTop5(d){
   let html="";
   function table(title,rows,field){
