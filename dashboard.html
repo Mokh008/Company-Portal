@@ -228,7 +228,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxpmflmecD6iXTypWMa6b5E41Upo_sgXtvzEOjLiFM_NLU_A-LouTRcqTc0P39Uz2HR/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbyeAXCeK3pEunUyV6koX114IrUp32i0QLx_lMgvmx8qRGjFca4Nq6aO6yM0-luqSxRc/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -249,62 +249,69 @@ function switchTab(tab,e){
   e.target.classList.add("active");
   loadData();
 }
-
-function loadData(){
+function loadAdminData(){
 
   showLoader();
 
-  const month = document.getElementById("monthFilter").value;
-  const sector = document.getElementById("sectorFilter").value;
+  const month = document.getElementById("adminMonthFilter")?.value || "";
 
   fetch(API_URL,{
-  method:"POST",
-  body: JSON.stringify({
-    action:"analytics",
-    user:user,
-    filters:{ month, sector }
+    method:"POST",
+    body: JSON.stringify({
+      action:"adminAnalytics",
+      user:user,
+      filters:{ month }
+    })
   })
-})
-  .then(res => {
-    if(!res.ok){
-      throw new Error("Network response was not ok");
-    }
-    return res.json();
-  })
+  .then(res => res.json())
   .then(data => {
 
-    console.log("API Response:", data); // مهم عشان تشوف بيرجع ايه
-
     if(!data || data.success === false){
-      throw new Error(data?.error || "Invalid API response");
+      throw new Error(data?.error || "Admin API error");
     }
-
-    renderProjects();
 
     if(data.kpis)
       renderKPIs(data.kpis);
 
-    if(data.custody)
-      renderCustody(data.custody);
+    hideLoader();
+  })
+  .catch(err=>{
+    hideLoader();
+    alert("Admin error: " + err.message);
+  });
+}
+  function loadSupplyData(){
+
+  const date = document.getElementById("supplyDateFilter")?.value || "";
+  const sector = document.getElementById("supplySectorFilter")?.value || "";
+
+  fetch(API_URL,{
+    method:"POST",
+    body: JSON.stringify({
+      action:"supplyAnalytics",
+      user:user,
+      filters:{ date, sector }
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    if(!data || data.success === false){
+      throw new Error(data?.error || "Supply API error");
+    }
 
     if(data.supplySummary)
-      renderSupply(data.supplySummary[currentTab]);
+      renderSupply(data.supplySummary);
 
     if(data.supplyTop5)
-      renderTop5(data.supplyTop5[currentTab]);
+      renderTop5(data.supplyTop5);
 
     if(data.sectorComparison)
       renderSector(data.sectorComparison);
 
-    if(data.rentVsExpensesTrend)
-      renderCharts(data);
-
-    hideLoader();
   })
   .catch(err=>{
-    console.error("Fetch Error:", err);
-    hideLoader();
-    alert("Connection error: " + err.message);
+    alert("Supply error: " + err.message);
   });
 }
 function renderProjects(){
@@ -371,9 +378,12 @@ function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
-loadData();
-setInterval(loadData,60000);
-</script>
+loadAdminData();
+loadSupplyData();
+
+setInterval(() => {
+  loadSupplyData();
+}, 60000);</script>
 
 </body>
 </html>
