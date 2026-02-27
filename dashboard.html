@@ -166,26 +166,23 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 
-<!-- ADMIN FILTER (شهري) -->
+<<!-- ADMIN FILTERS -->
 <div class="kpis">
+
   <div class="kpi-card">
     <div class="kpi-title">Month (Administrative)</div>
-    <select id="monthFilter" onchange="loadAdminData()">
+    <select id="monthFilter" onchange="loadAdminData()"></select>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-title">Sector (Administrative)</div>
+    <select id="adminSectorFilter" onchange="loadAdminData()">
       <option value="">All</option>
-      <option value="1">Jan</option>
-      <option value="2">Feb</option>
-      <option value="3">Mar</option>
-      <option value="4">Apr</option>
-      <option value="5">May</option>
-      <option value="6">Jun</option>
-      <option value="7">Jul</option>
-      <option value="8">Aug</option>
-      <option value="9">Sep</option>
-      <option value="10">Oct</option>
-      <option value="11">Nov</option>
-      <option value="12">Dec</option>
+      <option value="Traditional">Traditional</option>
+      <option value="Mechanical">Mechanical</option>
     </select>
   </div>
+
 </div>
 
 <div id="projectsSection" class="projects"></div>
@@ -193,15 +190,17 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 <div id="custodySection"></div>
 
 <h2 class="section-title">Supply Performance</h2>
-
+  
 <!-- SUPPLY FILTERS (يومي + قطاع) -->
 <div class="kpis">
   <div class="kpi-card">
     <div class="kpi-title">Select Date (Supply)</div>
     <input type="date"
-           id="supplyDateFilter"
-           onchange="loadSupplyData()"
-           style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
+       id="supplyDateFilter"
+       onchange="loadSupplyData()"
+       onkeydown="return false"
+       onpaste="return false"
+       style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
   </div>
 
   <div class="kpi-card">
@@ -232,7 +231,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxGBZV7A4X-czHIjtyv05nsG3qmeyNeGEjlFHc_ff2bUb4NpQG-C09EKumQ9wvLRne7/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwAqMBjVxhp5dgc-_zFwNp5OmFwte5SF8bXDreKMnZkboo794vFf_e8OMTNH0B3pQ24/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -243,6 +242,45 @@ let currentTab="today";
 let rentChart,employeeChart,supplyChart,sugarChart,tareChart;
 let sectorCharts=[];
 
+/* ===== ADMIN MONTH BUILDER ===== */
+
+function buildAdminMonthFilter(){
+
+  const select = document.getElementById("monthFilter");
+  if(!select) return;
+
+  select.innerHTML = "";
+
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear - 1, currentYear, currentYear + 1];
+
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = "All";
+  select.appendChild(allOption);
+
+  const months = [
+    "01","02","03","04","05","06",
+    "07","08","09","10","11","12"
+  ];
+
+  years.forEach(year=>{
+    months.forEach((m,i)=>{
+      const option = document.createElement("option");
+      option.value = m + "-" + year;
+      option.textContent =
+        new Date(year, i).toLocaleString('default', { month: 'long' }) + " " + year;
+
+      select.appendChild(option);
+    });
+  });
+
+  const now = new Date();
+  const currentValue =
+    String(now.getMonth()+1).padStart(2,'0') + "-" + now.getFullYear();
+
+  select.value = currentValue;
+}
 function currency(n){return new Intl.NumberFormat().format(n||0);}
 function showLoader(){document.getElementById("loaderOverlay").style.display="flex";}
 function hideLoader(){document.getElementById("loaderOverlay").style.display="none";}
@@ -257,14 +295,15 @@ function loadAdminData(){
 
   showLoader();
 
-  const month = document.getElementById("adminMonthFilter")?.value || "";
+  const month = document.getElementById("monthFilter")?.value || "";
+  const sector = document.getElementById("adminSectorFilter")?.value || "";
 
   fetch(API_URL,{
     method:"POST",
     body: JSON.stringify({
       action:"adminAnalytics",
       user:user,
-      filters:{ month }
+      filters:{ month, sector }
     })
   })
   .then(res => res.json())
@@ -287,7 +326,10 @@ function loadAdminData(){
   function loadSupplyData(){
 
   const date = document.getElementById("supplyDateFilter")?.value || "";
-  const sector = document.getElementById("supplySectorFilter")?.value || "";
+  const sector = document.getElementById("sectorFilter")?.value || "";
+
+  console.log("Selected Date:", date);
+  console.log("Selected Sector:", sector);
 
   fetch(API_URL,{
     method:"POST",
@@ -487,6 +529,7 @@ function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
+buildAdminMonthFilter();
 loadAdminData();
 loadSupplyData();
 
