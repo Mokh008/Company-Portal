@@ -242,8 +242,6 @@ let currentTab="today";
 let rentChart,employeeChart,supplyChart,sugarChart,tareChart;
 let sectorCharts=[];
 
-/* ===== ADMIN MONTH BUILDER ===== */
-
 function buildAdminMonthFilter(){
 
   const select = document.getElementById("monthFilter");
@@ -251,31 +249,32 @@ function buildAdminMonthFilter(){
 
   select.innerHTML = "";
 
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
-
+  // All option
   const allOption = document.createElement("option");
   allOption.value = "";
   allOption.textContent = "All";
   select.appendChild(allOption);
 
-  const months = [
-    "01","02","03","04","05","06",
-    "07","08","09","10","11","12"
-  ];
-
-  years.forEach(year=>{
-    months.forEach((m,i)=>{
-      const option = document.createElement("option");
-      option.value = m + "-" + year;
-      option.textContent =
-        new Date(year, i).toLocaleString('default', { month: 'long' }) + " " + year;
-
-      select.appendChild(option);
-    });
-  });
-
   const now = new Date();
+
+  // آخر 18 شهر
+  for(let i=0;i<18;i++){
+
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+    const month = String(d.getMonth()+1).padStart(2,'0');
+    const year = d.getFullYear();
+
+    const option = document.createElement("option");
+    option.value = month + "-" + year;
+
+    option.textContent =
+      d.toLocaleString('default', { month: 'long' }) + " " + year;
+
+    select.appendChild(option);
+  }
+
+  // نخلي الشهر الحالي default
   const currentValue =
     String(now.getMonth()+1).padStart(2,'0') + "-" + now.getFullYear();
 
