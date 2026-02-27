@@ -235,11 +235,10 @@ button:active{
 
 .top5-row{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  grid-template-columns:repeat(3, 1fr);
   gap:25px;
   margin-bottom:40px;
 }
-
 .top5-card{
   background:var(--card);
   padding:20px;
