@@ -597,9 +597,15 @@ function renderSupplyCharts(sec){
   const sugar     = sectors.map(s=>sec[s].avgSugar || 0);
   const tare      = sectors.map(s=>sec[s].avgTare || 0);
 
-  if(window.supplyPlanChart) supplyPlanChart.destroy();
-  if(window.supplySugarChart) supplySugarChart.destroy();
-  if(window.supplyTareChart) supplyTareChart.destroy();
+if(supplyPlanChart && typeof supplyPlanChart.destroy === "function"){
+  supplyPlanChart.destroy();
+} 
+if(supplySugarChart && typeof supplySugarChart.destroy === "function"){
+  supplySugarChart.destroy();
+}
+if(supplyTareChart && typeof supplyTareChart.destroy === "function"){
+  supplyTareChart.destroy();
+}
 
   supplyPlanChart = new Chart(
     document.getElementById("supplyPlanChart"),
