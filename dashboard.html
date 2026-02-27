@@ -231,7 +231,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxqdr_CfRayQZshRzvtqvKc_eioKKlZCBUYjdoYIwqMWBns3gdlezeBpl3-kgLY4cNq/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbybYWKnsKufGWRkpMkYvuKbvQaoR6Bs1XcwmhSt9ObTMIF9XN314J3O0Nbb94xI98FN/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -375,12 +375,17 @@ function renderProjects(){
 }
 
 function renderKPIs(k){
-  document.getElementById("kpiSection").innerHTML=
-  '<div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">'+currency(k.totalRent)+'</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">'+currency(k.totalExpenses)+'</div></div>'+
-  '<div class="kpi-card"><div class="kpi-title">Operating (Month)</div><div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div></div>';
-}
 
+  document.getElementById("kpiSection").innerHTML=
+
+  '<div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">'+currency(k.totalRent)+'</div></div>'+
+
+  '<div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">'+currency(k.totalExpenses)+'</div></div>'+
+
+  '<div class="kpi-card"><div class="kpi-title">Operating Cost</div><div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div></div>'+
+
+  '<div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(k.custody.currentBalance)+'</div></div>';
+}
 function renderCustody(c){
   document.getElementById("custodySection").innerHTML=
   '<div class="kpis"><div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(c.currentBalance)+'</div></div></div>';
@@ -528,10 +533,11 @@ function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
+renderProjects();
 buildAdminMonthFilter();
 loadAdminData();
 loadSupplyData();
-
+  
 setInterval(() => {
   loadSupplyData();
 }, 60000);</script>
