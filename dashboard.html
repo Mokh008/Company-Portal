@@ -231,7 +231,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbyVkMsY7yd8o4b9V6gYuZ_REeB60A2pfFcsZvB8WVFtHncT1U2r9Ti2L-HmvDPjpisC/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbzoSotceuGdGXsr50BPuwVb248m5-Bd9yiLmWXdqoeu3wqxorYYCE4JoqJAprBnSi6g/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -485,48 +485,50 @@ function renderSupply(data){
 
   if(!data || !data.today || !data.toDate) return;
 
-  function buildTable(title, rows, field){
+  function buildCard(title, rows, field){
 
     if(!rows || !rows.length) return "";
 
     let html = `
-      <div class="kpi-card">
-        <h4>${title}</h4>
+      <div class="top5-card">
+        <h3>${title}</h3>
         <table>
     `;
 
     rows.forEach((r,i)=>{
-      let cls = i===0 ? "rank1" :
-                i===1 ? "rank2" :
-                i===2 ? "rank3" : "";
+      let medal = i===0 ? "🥇" :
+                  i===1 ? "🥈" :
+                  i===2 ? "🥉" : "";
 
       html += `
-        <tr class="${cls}">
-          <td>${i+1}. ${r.engineer}</td>
+        <tr>
+          <td>${medal} ${r.engineer}</td>
           <td>${(r[field] || 0).toFixed(2)}</td>
         </tr>
       `;
     });
 
     html += "</table></div>";
-
     return html;
   }
 
-  const today = data.today;
-  const toDate = data.toDate;
+  let html = `
+    <div class="top5-section">
+      <h2 class="section-title">Top 5 - Today</h2>
+      <div class="top5-row">
+        ${buildCard("Top Ton", data.today.topTons, "tons")}
+        ${buildCard("Top Sugar", data.today.topSugar, "sugar")}
+        ${buildCard("Top Tare", data.today.topTare, "tare")}
+      </div>
 
-  let html = "";
-
-  // Today
-  html += buildTable("Top 5 Ton (Today)", today.topTons, "tons");
-  html += buildTable("Top 5 Sugar (Today)", today.topSugar, "sugar");
-  html += buildTable("Top 5 Tare (Today)", today.topTare, "tare");
-
-  // To Date
-  html += buildTable("Top 5 Ton (To Date)", toDate.topTons, "tons");
-  html += buildTable("Top 5 Sugar (To Date)", toDate.topSugar, "sugar");
-  html += buildTable("Top 5 Tare (To Date)", toDate.topTare, "tare");
+      <h2 class="section-title">Top 5 - To Date</h2>
+      <div class="top5-row">
+        ${buildCard("Top Ton", data.toDate.topTons, "tons")}
+        ${buildCard("Top Sugar", data.toDate.topSugar, "sugar")}
+        ${buildCard("Top Tare", data.toDate.topTare, "tare")}
+      </div>
+    </div>
+  `;
 
   document.getElementById("top5Section").innerHTML = html;
 }
