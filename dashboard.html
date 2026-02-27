@@ -166,7 +166,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 
-<<!-- ADMIN FILTERS -->
+<!-- ADMIN FILTERS -->
 <div class="kpis">
 
   <div class="kpi-card">
@@ -334,7 +334,9 @@ function loadAdminData(){
 
     if(data.kpis)
       renderKPIs(data.kpis);
-
+if(data.sectorComparison){
+  renderAdminCharts(data.sectorComparison);
+}
     hideLoader();
   })
   .catch(err=>{
@@ -376,9 +378,9 @@ function loadAdminData(){
     if(data.supplyTop5)
       renderTop5(data.supplyTop5);
 
-    if(data.sectorComparison)
-      renderSector(data.sectorComparison);
-
+if(data.sectorComparison){
+  renderSupplyCharts(data.sectorComparison);
+}
     hideLoader();
   })
   .catch(err=>{
