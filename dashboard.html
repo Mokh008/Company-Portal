@@ -216,20 +216,40 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 <div id="supplyKPIs" class="kpis"></div>
 <div id="top5Section" class="kpis"></div>
 
-<h3 class="section-title">Sector Comparison (Admin Only)</h3>
-<div id="sectorSection" class="charts"></div>
+<!-- ================= ADMIN CHARTS ================= -->
 
-<div class="charts">
-  <div class="chart-card"><h3>Rent vs Expenses</h3><canvas id="rentChart"></canvas></div>
-  <div class="chart-card"><h3>Employee Activity</h3><canvas id="employeeChart"></canvas></div>
-  <div class="chart-card"><h3>Plan vs Actual</h3><canvas id="supplyChart"></canvas></div>
-  <div class="chart-card"><h3>Sugar %</h3><canvas id="sugarChart"></canvas></div>
-  <div class="chart-card"><h3>Tare %</h3><canvas id="tareChart"></canvas></div>
-</div>
-<div id="loaderOverlay" class="loader-overlay">
-<div class="spinner"></div>
+<h3 class="section-title">Administrative Charts</h3>
+<div id="adminCharts" class="charts">
+  <div class="chart-card">
+    <h3>Rent vs Expenses</h3>
+    <canvas id="adminRentChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Employee Activity</h3>
+    <canvas id="adminEmployeeChart"></canvas>
+  </div>
 </div>
 
+<!-- ================= SUPPLY CHARTS ================= -->
+
+<h3 class="section-title">Supply Charts</h3>
+<div id="supplyCharts" class="charts">
+  <div class="chart-card">
+    <h3>Plan vs Actual</h3>
+    <canvas id="supplyPlanChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Sugar %</h3>
+    <canvas id="supplySugarChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Tare %</h3>
+    <canvas id="supplyTareChart"></canvas>
+  </div>
+</div>
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbzoSotceuGdGXsr50BPuwVb248m5-Bd9yiLmWXdqoeu3wqxorYYCE4JoqJAprBnSi6g/exec";
 const user=JSON.parse(localStorage.getItem("user"));
@@ -533,11 +553,88 @@ function renderSupply(data){
 
   document.getElementById("top5Section").innerHTML = html;
 }
-function renderSector(sec){
-  if(user.role!=="admin") return;
+// ================= ADMIN CHARTS =================
+
+function renderAdminCharts(sec){
+
+  if(!sec) return;
+
+  const sectors = Object.keys(sec);
+
+  const rentData     = sectors.map(s=>sec[s].rent || 0);
+  const expensesData = sectors.map(s=>sec[s].expenses || 0);
+
+  if(window.adminRentChart) adminRentChart.destroy();
+
+  adminRentChart = new Chart(
+    document.getElementById("adminRentChart"),
+    {
+      type:"bar",
+      data:{
+        labels:sectors,
+        datasets:[
+          {label:"Rent", data:rentData},
+          {label:"Expenses", data:expensesData}
+        ]
+      }
+    }
+  );
 }
 
-function renderCharts(data){}
+
+// ================= SUPPLY CHARTS =================
+
+function renderSupplyCharts(sec){
+
+  if(!sec) return;
+
+  const sectors = Object.keys(sec);
+
+  const quota     = sectors.map(s=>sec[s].quota || 0);
+  const delivered = sectors.map(s=>sec[s].delivered || 0);
+  const sugar     = sectors.map(s=>sec[s].avgSugar || 0);
+  const tare      = sectors.map(s=>sec[s].avgTare || 0);
+
+  if(window.supplyPlanChart) supplyPlanChart.destroy();
+  if(window.supplySugarChart) supplySugarChart.destroy();
+  if(window.supplyTareChart) supplyTareChart.destroy();
+
+  supplyPlanChart = new Chart(
+    document.getElementById("supplyPlanChart"),
+    {
+      type:"bar",
+      data:{
+        labels:sectors,
+        datasets:[
+          {label:"Quota", data:quota},
+          {label:"Delivered", data:delivered}
+        ]
+      }
+    }
+  );
+
+  supplySugarChart = new Chart(
+    document.getElementById("supplySugarChart"),
+    {
+      type:"bar",
+      data:{
+        labels:sectors,
+        datasets:[{label:"Sugar %", data:sugar}]
+      }
+    }
+  );
+
+  supplyTareChart = new Chart(
+    document.getElementById("supplyTareChart"),
+    {
+      type:"bar",
+      data:{
+        labels:sectors,
+        datasets:[{label:"Tare %", data:tare}]
+      }
+    }
+  );
+}
 
 function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
