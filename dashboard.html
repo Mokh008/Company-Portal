@@ -516,15 +516,15 @@ function renderSupply(data){
 
   let html = `
 
-    <!-- TODAY ROW -->
-    <div class="kpis">
+    <!-- TODAY -->
+    <div class="top5-row">
       ${buildCard("Top 5 Ton (Today)", data.today.topTons, "tons")}
       ${buildCard("Top 5 Sugar (Today)", data.today.topSugar, "sugar")}
       ${buildCard("Top 5 Tare (Today)", data.today.topTare, "tare")}
     </div>
 
-    <!-- TO DATE ROW -->
-    <div class="kpis" style="margin-top:25px;">
+    <!-- TO DATE -->
+    <div class="top5-row" style="margin-top:30px;">
       ${buildCard("Top 5 Ton (To Date)", data.toDate.topTons, "tons")}
       ${buildCard("Top 5 Sugar (To Date)", data.toDate.topSugar, "sugar")}
       ${buildCard("Top 5 Tare (To Date)", data.toDate.topTare, "tare")}
