@@ -324,11 +324,11 @@ function loadAdminData(){
 }
   function loadSupplyData(){
 
-  const date = document.getElementById("supplyDateFilter")?.value || "";
-  const sector = document.getElementById("sectorFilter")?.value || "";
+  showLoader();
 
-  console.log("Selected Date:", date);
-  console.log("Selected Sector:", sector);
+  const dateInput = document.getElementById("supplyDateFilter");
+  const date = dateInput?.value || "";
+  const sector = document.getElementById("sectorFilter")?.value || "";
 
   fetch(API_URL,{
     method:"POST",
@@ -345,6 +345,11 @@ function loadAdminData(){
       throw new Error(data?.error || "Supply API error");
     }
 
+    // 🔥 لو السيرفر اختار تاريخ تلقائي، ظبطه في الـ Date Picker
+    if(!date && data.supplySummary?.selectedDate){
+      dateInput.value = data.supplySummary.selectedDate;
+    }
+
     if(data.supplySummary)
       renderSupply(data.supplySummary);
 
@@ -354,8 +359,10 @@ function loadAdminData(){
     if(data.sectorComparison)
       renderSector(data.sectorComparison);
 
+    hideLoader();
   })
   .catch(err=>{
+    hideLoader();
     alert("Supply error: " + err.message);
   });
 }
