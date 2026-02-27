@@ -490,43 +490,44 @@ function renderSupply(data){
     if(!rows || !rows.length) return "";
 
     let html = `
-      <div class="top5-card">
-        <h3>${title}</h3>
+      <div class="kpi-card">
+        <h4>${title}</h4>
         <table>
     `;
 
     rows.forEach((r,i)=>{
-      let medal = i===0 ? "🥇" :
-                  i===1 ? "🥈" :
-                  i===2 ? "🥉" : "";
+
+      let cls = i===0 ? "rank1" :
+                i===1 ? "rank2" :
+                i===2 ? "rank3" : "";
 
       html += `
-        <tr>
-          <td>${medal} ${r.engineer}</td>
+        <tr class="${cls}">
+          <td>${i+1}. ${r.engineer}</td>
           <td>${(r[field] || 0).toFixed(2)}</td>
         </tr>
       `;
     });
 
     html += "</table></div>";
+
     return html;
   }
 
   let html = `
-    <div class="top5-section">
-      <h2 class="section-title">Top 5 - Today</h2>
-      <div class="top5-row">
-        ${buildCard("Top Ton", data.today.topTons, "tons")}
-        ${buildCard("Top Sugar", data.today.topSugar, "sugar")}
-        ${buildCard("Top Tare", data.today.topTare, "tare")}
-      </div>
 
-      <h2 class="section-title">Top 5 - To Date</h2>
-      <div class="top5-row">
-        ${buildCard("Top Ton", data.toDate.topTons, "tons")}
-        ${buildCard("Top Sugar", data.toDate.topSugar, "sugar")}
-        ${buildCard("Top Tare", data.toDate.topTare, "tare")}
-      </div>
+    <!-- TODAY ROW -->
+    <div class="kpis">
+      ${buildCard("Top 5 Ton (Today)", data.today.topTons, "tons")}
+      ${buildCard("Top 5 Sugar (Today)", data.today.topSugar, "sugar")}
+      ${buildCard("Top 5 Tare (Today)", data.today.topTare, "tare")}
+    </div>
+
+    <!-- TO DATE ROW -->
+    <div class="kpis" style="margin-top:25px;">
+      ${buildCard("Top 5 Ton (To Date)", data.toDate.topTons, "tons")}
+      ${buildCard("Top 5 Sugar (To Date)", data.toDate.topSugar, "sugar")}
+      ${buildCard("Top 5 Tare (To Date)", data.toDate.topTare, "tare")}
     </div>
   `;
 
