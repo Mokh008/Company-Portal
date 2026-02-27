@@ -166,11 +166,11 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 
-<!-- FILTERS -->
+<!-- ADMIN FILTER (شهري) -->
 <div class="kpis">
   <div class="kpi-card">
-    <div class="kpi-title">Month</div>
-    <select id="monthFilter" onchange="loadData()">
+    <div class="kpi-title">Month (Administrative)</div>
+    <select id="monthFilter" onchange="loadAdminData()">
       <option value="">All</option>
       <option value="1">Jan</option>
       <option value="2">Feb</option>
@@ -186,14 +186,6 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
       <option value="12">Dec</option>
     </select>
   </div>
-  <div class="kpi-card">
-    <div class="kpi-title">Sector</div>
-    <select id="sectorFilter" onchange="loadData()">
-      <option value="">All</option>
-      <option value="Traditional">Traditional</option>
-      <option value="Mechanical">Mechanical</option>
-    </select>
-  </div>
 </div>
 
 <div id="projectsSection" class="projects"></div>
@@ -201,6 +193,26 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 <div id="custodySection"></div>
 
 <h2 class="section-title">Supply Performance</h2>
+
+<!-- SUPPLY FILTERS (يومي + قطاع) -->
+<div class="kpis">
+  <div class="kpi-card">
+    <div class="kpi-title">Select Date (Supply)</div>
+    <input type="date"
+           id="supplyDateFilter"
+           onchange="loadSupplyData()"
+           style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-title">Sector (Supply)</div>
+    <select id="sectorFilter" onchange="loadSupplyData()">
+      <option value="">All</option>
+      <option value="Traditional">Traditional</option>
+      <option value="Mechanical">Mechanical</option>
+    </select>
+  </div>
+</div>
 
 <div id="supplyKPIs" class="kpis"></div>
 <div id="top5Section" class="kpis"></div>
@@ -215,15 +227,12 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   <div class="chart-card"><h3>Sugar %</h3><canvas id="sugarChart"></canvas></div>
   <div class="chart-card"><h3>Tare %</h3><canvas id="tareChart"></canvas></div>
 </div>
-
-</div>
-
 <div id="loaderOverlay" class="loader-overlay">
 <div class="spinner"></div>
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbzTfn-Oa9-lXgJrYHE4CltDq0n7CaKyYqOmZlVjuCXnYmoMz00nWoGmtJ9Dz_wZ1gp4/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbxGBZV7A4X-czHIjtyv05nsG3qmeyNeGEjlFHc_ff2bUb4NpQG-C09EKumQ9wvLRne7/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
