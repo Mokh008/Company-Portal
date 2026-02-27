@@ -648,14 +648,31 @@ function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
-renderProjects();
-buildAdminMonthFilter();
-loadAdminData();
-loadSupplyData();
-  
-setInterval(() => {
+window.addEventListener("DOMContentLoaded", function(){
+
+  renderProjects();
+  buildAdminMonthFilter();
+
+  // ندي فرصة للـ select ياخد القيمة
+  setTimeout(() => {
+    loadAdminData();
+  }, 100);
+
+  // AUTO SUPPLY DATE
+  const dateInput = document.getElementById("supplyDateFilter");
+
+  if(!dateInput.value){
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.value = today;
+  }
+
   loadSupplyData();
-}, 60000);
+
+  setInterval(() => {
+    loadSupplyData();
+  }, 60000);
+
+});
 </script>
 <div id="loaderOverlay" class="loader-overlay">
   <div class="spinner"></div>
