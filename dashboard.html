@@ -611,62 +611,6 @@ function renderAdminCharts(data){
 let adminRentChart = null;
 let adminEmployeeChart = null;
 
-function renderAdminCharts(sec){
-
-  if(!sec || Object.keys(sec).length === 0) return;
-
-  const sectors = Object.keys(sec);
-
-  const rentData = sectors.map(s => sec[s].rent || 0);
-  const expensesData = sectors.map(s => sec[s].expenses || 0);
-  const employeeData = sectors.map(s => sec[s].employees || 0);
-
-  if(adminRentChart) adminRentChart.destroy();
-  if(adminEmployeeChart) adminEmployeeChart.destroy();
-
-  adminRentChart = new Chart(
-    document.getElementById("adminRentChart"),
-    {
-      type: "bar",
-      data: {
-        labels: sectors,
-        datasets: [
-          {
-            label: "Rent",
-            data: rentData,
-            borderRadius: 10
-          },
-          {
-            label: "Expenses",
-            data: expensesData,
-            borderRadius: 10
-          }
-        ]
-      },
-      options: getProfessionalOptions()
-    }
-  );
-
-  adminEmployeeChart = new Chart(
-    document.getElementById("adminEmployeeChart"),
-    {
-      type: "doughnut",
-      data: {
-        labels: sectors,
-        datasets: [
-          {
-            data: employeeData
-          }
-        ]
-      },
-      options: {
-        ...getProfessionalOptions(),
-        cutout: "65%"
-      }
-    }
-  );
-}
-
 // ================= SUPPLY CHARTS =================
 
 let supplyPlanChart = null;
