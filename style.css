@@ -250,3 +250,16 @@ button:active{
   margin-bottom:15px;
   font-size:16px;
 }
+.chart-card {
+  background: var(--card);
+  padding: 25px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  height: 380px;          /* 👈 مهم جداً */
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-card canvas {
+  flex: 1;
+}
