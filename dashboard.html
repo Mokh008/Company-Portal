@@ -188,6 +188,20 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 <div id="projectsSection" class="projects"></div>
 <div id="kpiSection" class="kpis"></div>
 <div id="custodySection"></div>
+<!-- ================= ADMIN CHARTS ================= -->
+
+<h3 class="section-title">Administrative Charts</h3>
+<div id="adminCharts" class="charts">
+  <div class="chart-card">
+    <h3>Rent vs Expenses</h3>
+    <canvas id="adminRentChart"></canvas>
+  </div>
+
+  <div class="chart-card">
+    <h3>Employee Activity</h3>
+    <canvas id="adminEmployeeChart"></canvas>
+  </div>
+</div>
 
 <h2 class="section-title">Supply Performance</h2>
   
@@ -216,20 +230,6 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 <div id="supplyKPIs" class="kpis"></div>
 <div id="top5Section" class="kpis"></div>
 
-<!-- ================= ADMIN CHARTS ================= -->
-
-<h3 class="section-title">Administrative Charts</h3>
-<div id="adminCharts" class="charts">
-  <div class="chart-card">
-    <h3>Rent vs Expenses</h3>
-    <canvas id="adminRentChart"></canvas>
-  </div>
-
-  <div class="chart-card">
-    <h3>Employee Activity</h3>
-    <canvas id="adminEmployeeChart"></canvas>
-  </div>
-</div>
 
 <!-- ================= SUPPLY CHARTS ================= -->
 
@@ -557,99 +557,179 @@ function renderSupply(data){
 }
 // ================= ADMIN CHARTS =================
 
+let adminRentChart = null;
+let adminEmployeeChart = null;
+
 function renderAdminCharts(sec){
 
-  if(!sec) return;
+  if(!sec || Object.keys(sec).length === 0) return;
 
   const sectors = Object.keys(sec);
 
-  const rentData     = sectors.map(s=>sec[s].rent || 0);
-  const expensesData = sectors.map(s=>sec[s].expenses || 0);
+  const rentData = sectors.map(s => sec[s].rent || 0);
+  const expensesData = sectors.map(s => sec[s].expenses || 0);
+  const employeeData = sectors.map(s => sec[s].employees || 0);
 
-  if(window.adminRentChart) adminRentChart.destroy();
+  if(adminRentChart) adminRentChart.destroy();
+  if(adminEmployeeChart) adminEmployeeChart.destroy();
 
   adminRentChart = new Chart(
     document.getElementById("adminRentChart"),
     {
-      type:"bar",
-      data:{
-        labels:sectors,
-        datasets:[
-          {label:"Rent", data:rentData},
-          {label:"Expenses", data:expensesData}
+      type: "bar",
+      data: {
+        labels: sectors,
+        datasets: [
+          {
+            label: "Rent",
+            data: rentData,
+            borderRadius: 10
+          },
+          {
+            label: "Expenses",
+            data: expensesData,
+            borderRadius: 10
+          }
         ]
+      },
+      options: getProfessionalOptions()
+    }
+  );
+
+  adminEmployeeChart = new Chart(
+    document.getElementById("adminEmployeeChart"),
+    {
+      type: "doughnut",
+      data: {
+        labels: sectors,
+        datasets: [
+          {
+            data: employeeData
+          }
+        ]
+      },
+      options: {
+        ...getProfessionalOptions(),
+        cutout: "65%"
       }
     }
   );
 }
 
-
 // ================= SUPPLY CHARTS =================
+
+let supplyPlanChart = null;
+let supplySugarChart = null;
+let supplyTareChart = null;
 
 function renderSupplyCharts(sec){
 
-  if(!sec) return;
+  if(!sec || Object.keys(sec).length === 0) return;
 
   const sectors = Object.keys(sec);
 
-  const quota     = sectors.map(s=>sec[s].quota || 0);
-  const delivered = sectors.map(s=>sec[s].delivered || 0);
-  const sugar     = sectors.map(s=>sec[s].avgSugar || 0);
-  const tare      = sectors.map(s=>sec[s].avgTare || 0);
+  const quota = sectors.map(s => sec[s].quota || 0);
+  const delivered = sectors.map(s => sec[s].delivered || 0);
+  const sugar = sectors.map(s => sec[s].avgSugar || 0);
+  const tare = sectors.map(s => sec[s].avgTare || 0);
 
-if(supplyPlanChart && typeof supplyPlanChart.destroy === "function"){
-  supplyPlanChart.destroy();
-} 
-if(supplySugarChart && typeof supplySugarChart.destroy === "function"){
-  supplySugarChart.destroy();
-}
-if(supplyTareChart && typeof supplyTareChart.destroy === "function"){
-  supplyTareChart.destroy();
-}
+  if(supplyPlanChart) supplyPlanChart.destroy();
+  if(supplySugarChart) supplySugarChart.destroy();
+  if(supplyTareChart) supplyTareChart.destroy();
 
   supplyPlanChart = new Chart(
     document.getElementById("supplyPlanChart"),
     {
-      type:"bar",
-      data:{
-        labels:sectors,
-        datasets:[
-          {label:"Quota", data:quota},
-          {label:"Delivered", data:delivered}
+      type: "bar",
+      data: {
+        labels: sectors,
+        datasets: [
+          { label: "Quota", data: quota, borderRadius: 10 },
+          { label: "Delivered", data: delivered, borderRadius: 10 }
         ]
-      }
+      },
+      options: getProfessionalOptions()
     }
   );
 
   supplySugarChart = new Chart(
     document.getElementById("supplySugarChart"),
     {
-      type:"bar",
-      data:{
-        labels:sectors,
-        datasets:[{label:"Sugar %", data:sugar}]
-      }
+      type: "line",
+      data: {
+        labels: sectors,
+        datasets: [
+          {
+            label: "Sugar %",
+            data: sugar,
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      },
+      options: getProfessionalOptions()
     }
   );
 
   supplyTareChart = new Chart(
     document.getElementById("supplyTareChart"),
     {
-      type:"bar",
-      data:{
-        labels:sectors,
-        datasets:[{label:"Tare %", data:tare}]
-      }
+      type: "line",
+      data: {
+        labels: sectors,
+        datasets: [
+          {
+            label: "Tare %",
+            data: tare,
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      },
+      options: getProfessionalOptions()
     }
   );
 }
-
 function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
 window.addEventListener("DOMContentLoaded", function(){
+function getProfessionalOptions(){
 
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    animation: {
+      duration: 1400,
+      easing: "easeInOutQuart"
+    },
+
+    plugins: {
+      legend: {
+        labels: {
+          color: "#f1f5f9",
+          font: {
+            size: 13,
+            weight: "500"
+          }
+        }
+      }
+    },
+
+    scales: {
+      x: {
+        ticks: { color: "#94a3b8" },
+        grid: { color: "rgba(148,163,184,.08)" }
+      },
+      y: {
+        ticks: { color: "#94a3b8" },
+        grid: { color: "rgba(148,163,184,.08)" }
+      }
+    }
+  };
+}
   renderProjects();
   buildAdminMonthFilter();
 
