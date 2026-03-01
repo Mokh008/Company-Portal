@@ -251,7 +251,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbyDdbRqbrvgKqPe5XeRxtrWlgU5W1mR1UBOKPxOBPgsuNC9q14yqzB_rBn0wl4MhHqi/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbzww9-j7y35YqFRyTHQ1YMqqaWY1J1YkWA_Ksy0ME983hymVbln_nDj7FiRJYdRDDDx/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -332,8 +332,12 @@ function loadAdminData(){
       throw new Error(data?.error || "Admin API error");
     }
 
-    if(data.kpis)
-      renderKPIs(data.kpis);
+if(data.kpis)
+  renderKPIs(data.kpis);
+
+if(data.adminCharts)
+  renderAdminCharts(data.adminCharts);
+    
 if(data.sectorComparison){
   renderAdminCharts(data.sectorComparison);
 }
@@ -554,6 +558,53 @@ function renderSupply(data){
   `;
 
   document.getElementById("top5Section").innerHTML = html;
+}
+  
+function renderAdminCharts(data){
+
+  // ===== Rent vs Expenses =====
+  if(window.adminRentChart) adminRentChart.destroy();
+
+  adminRentChart = new Chart(
+    document.getElementById("adminRentChart"),
+    {
+      type:"bar",
+      data:{
+        labels:["Rent","Expenses"],
+        datasets:[{
+          label:"Amount",
+          data:[data.rent, data.expenses],
+          borderRadius:12
+        }]
+      },
+      options:{
+        responsive:true,
+        animation:{ duration:1200, easing:"easeOutQuart" }
+      }
+    }
+  );
+
+  // ===== Employee Activity =====
+  if(window.adminEmployeeChart) adminEmployeeChart.destroy();
+
+  adminEmployeeChart = new Chart(
+    document.getElementById("adminEmployeeChart"),
+    {
+      type:"bar",
+      data:{
+        labels:data.employees.map(e=>e.name),
+        datasets:[{
+          label:"Attendance",
+          data:data.employees.map(e=>e.count),
+          borderRadius:10
+        }]
+      },
+      options:{
+        responsive:true,
+        animation:{ duration:1200, easing:"easeOutQuart" }
+      }
+    }
+  );
 }
 // ================= ADMIN CHARTS =================
 
