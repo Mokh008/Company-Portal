@@ -562,10 +562,19 @@ function renderSupply(data){
   
 function renderAdminCharts(data){
 
-  // ===== Rent vs Expenses =====
-  if(window.adminRentChart) adminRentChart.destroy();
+  if(!data) return;
 
-  adminRentChart = new Chart(
+  // destroy safely
+  if (window.adminRentChart instanceof Chart) {
+    window.adminRentChart.destroy();
+  }
+
+  if (window.adminEmployeeChart instanceof Chart) {
+    window.adminEmployeeChart.destroy();
+  }
+
+  // Rent vs Expenses
+  window.adminRentChart = new Chart(
     document.getElementById("adminRentChart"),
     {
       type:"bar",
@@ -573,40 +582,40 @@ function renderAdminCharts(data){
         labels:["Rent","Expenses"],
         datasets:[{
           label:"Amount",
-          data:[data.rent, data.expenses],
+          data:[data.rent || 0, data.expenses || 0],
           borderRadius:12
         }]
       },
       options:{
         responsive:true,
-        animation:{ duration:1200, easing:"easeOutQuart" }
+        maintainAspectRatio:true,
+        aspectRatio:2
       }
     }
   );
 
-  // ===== Employee Activity =====
-  if(window.adminEmployeeChart) adminEmployeeChart.destroy();
-
-  adminEmployeeChart = new Chart(
+  // Employee Activity
+  window.adminEmployeeChart = new Chart(
     document.getElementById("adminEmployeeChart"),
     {
       type:"bar",
       data:{
-        labels:data.employees.map(e=>e.name),
+        labels:(data.employees || []).map(e=>e.name),
         datasets:[{
           label:"Attendance",
-          data:data.employees.map(e=>e.count),
+          data:(data.employees || []).map(e=>e.count),
           borderRadius:10
         }]
       },
       options:{
         responsive:true,
-        animation:{ duration:1200, easing:"easeOutQuart" }
+        maintainAspectRatio:true,
+        aspectRatio:2
       }
     }
   );
 }
-// ================= ADMIN CHARTS =================
+  // ================= ADMIN CHARTS =================
 
 let adminRentChart = null;
 let adminEmployeeChart = null;
