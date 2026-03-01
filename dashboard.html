@@ -691,40 +691,12 @@ function renderSupplyCharts(sec){
   );
 }
 function getProfessionalOptions(){
-
   return {
     responsive: true,
-    maintainAspectRatio: false,
-
-    animation: {
-      duration: 1200,
-      easing: "easeInOutQuart"
-    },
-
-    plugins: {
-      legend: {
-        labels: {
-          color: "#f1f5f9",
-          font: {
-            size: 13
-          }
-        }
-      }
-    },
-
-    scales: {
-      x: {
-        ticks: { color: "#94a3b8" },
-        grid: { color: "rgba(148,163,184,.08)" }
-      },
-      y: {
-        ticks: { color: "#94a3b8" },
-        grid: { color: "rgba(148,163,184,.08)" }
-      }
-    }
+    maintainAspectRatio: true,   // 👈 أهم سطر
+    aspectRatio: 2               // 👈 بيخلي الارتفاع طبيعي
   };
-}
-function toggleTheme(){document.body.classList.toggle("light");}
+}function toggleTheme(){document.body.classList.toggle("light");}
 function logout(){localStorage.removeItem("user");window.location.href="index.html";}
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
