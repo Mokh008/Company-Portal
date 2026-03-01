@@ -690,11 +690,6 @@ function renderSupplyCharts(sec){
     }
   );
 }
-function toggleTheme(){document.body.classList.toggle("light");}
-function logout(){localStorage.removeItem("user");window.location.href="index.html";}
-function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
-
-window.addEventListener("DOMContentLoaded", function(){
 function getProfessionalOptions(){
 
   return {
@@ -702,7 +697,7 @@ function getProfessionalOptions(){
     maintainAspectRatio: false,
 
     animation: {
-      duration: 1400,
+      duration: 1200,
       easing: "easeInOutQuart"
     },
 
@@ -711,8 +706,7 @@ function getProfessionalOptions(){
         labels: {
           color: "#f1f5f9",
           font: {
-            size: 13,
-            weight: "500"
+            size: 13
           }
         }
       }
@@ -730,6 +724,11 @@ function getProfessionalOptions(){
     }
   };
 }
+function toggleTheme(){document.body.classList.toggle("light");}
+function logout(){localStorage.removeItem("user");window.location.href="index.html";}
+function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
+
+window.addEventListener("DOMContentLoaded", function(){
   renderProjects();
   buildAdminMonthFilter();
 
