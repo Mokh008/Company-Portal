@@ -251,7 +251,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxJcFp-adhpy9atsCPRy7YkHh-7sqcfA7XtpxhIs3xPC6H-MWXveFFjKmCFY4pmmiBi/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbwNdHI_QAfVpvKrdRX_1ztDTSEwVYhJswSrm-JCyr3atTWARhWAWqwi_MHP2C_Lzj4D/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -315,8 +315,13 @@ function loadAdminData(){
   showLoader();
 
   const month = document.getElementById("monthFilter")?.value || "";
-  const sector = document.getElementById("adminSectorFilter")?.value || "";
+let sector = "";
 
+if(user.role === "admin"){
+  sector = document.getElementById("adminSectorFilter")?.value || "";
+}else{
+  sector = user.sector || "";
+}
   fetch(API_URL,{
     method:"POST",
     body: JSON.stringify({
@@ -338,9 +343,6 @@ if(data.kpis)
 if(data.adminCharts)
   renderAdminCharts(data.adminCharts);
     
-if(data.sectorComparison){
-  renderAdminCharts(data.sectorComparison);
-}
     hideLoader();
   })
   .catch(err=>{
@@ -354,8 +356,13 @@ if(data.sectorComparison){
 
   const dateInput = document.getElementById("supplyDateFilter");
   const date = dateInput?.value || "";
-  const sector = document.getElementById("sectorFilter")?.value || "";
+let sector = "";
 
+if(user.role === "admin"){
+  sector = document.getElementById("sectorFilter")?.value || "";
+}else{
+  sector = user.sector || "";
+}
   fetch(API_URL,{
     method:"POST",
     body: JSON.stringify({
@@ -705,14 +712,28 @@ function logout(){localStorage.removeItem("user");window.location.href="index.ht
 function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
 
 window.addEventListener("DOMContentLoaded", function(){
+
+  // 🔐 Hide Sector Filters for non-admin
+  if(user.role !== "admin"){
+
+    const adminSector = document.getElementById("adminSectorFilter");
+    const supplySector = document.getElementById("sectorFilter");
+
+    if(adminSector){
+      adminSector.parentElement.style.display = "none";
+    }
+
+    if(supplySector){
+      supplySector.parentElement.style.display = "none";
+    }
+  }
+
   renderProjects();
   buildAdminMonthFilter();
 
-  // ندي فرصة للـ select ياخد القيمة
   setTimeout(() => {
     loadAdminData();
   }, 100);
-
   // AUTO SUPPLY DATE
   const dateInput = document.getElementById("supplyDateFilter");
 
