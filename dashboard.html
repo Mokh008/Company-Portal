@@ -251,7 +251,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   </div>
 </div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbyDOQiqQyUmbUi9yk4aa-bRdI8ovx0SP-jJbuzDEggXahgasdHw3Z9wfExBKbZrnHhB/exec";
+const API_URL="https://script.google.com/macros/s/AKfycby0ckwcIHcoNpxbFjmMbqquMAIZZqM7yKsMhl4kixOTNLSQTYkZhE787a0kWtEMV4hx/exec";
 const user=JSON.parse(localStorage.getItem("user"));
 if(!user) window.location.href="index.html";
 
@@ -416,30 +416,34 @@ function renderProjects(){
 
 function renderKPIs(k){
 
-  document.getElementById("kpiSection").innerHTML=
-
-  '<div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">'+currency(k.totalRent)+'</div></div>'+
-
-  '<div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">'+currency(k.totalExpenses)+'</div></div>'+
-
-  '<div class="kpi-card"><div class="kpi-title">Operating Cost</div><div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div></div>'+
-
   let custodyCard = "";
 
-if(user.role === "admin"){
-  custodyCard =
-  '<div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(k.custody.currentBalance)+'</div></div>';
-}
+  if(user.role === "admin"){
+    custodyCard =
+      '<div class="kpi-card">' +
+      '<div class="kpi-title">Custody Balance</div>' +
+      '<div class="kpi-value">'+currency(k.custody.currentBalance)+'</div>' +
+      '</div>';
+  }
 
-document.getElementById("kpiSection").innerHTML =
+  document.getElementById("kpiSection").innerHTML =
 
-  '<div class="kpi-card"><div class="kpi-title">Total Rent</div><div class="kpi-value">'+currency(k.totalRent)+'</div></div>'+
+    '<div class="kpi-card">' +
+      '<div class="kpi-title">Total Rent</div>' +
+      '<div class="kpi-value">'+currency(k.totalRent)+'</div>' +
+    '</div>'+
 
-  '<div class="kpi-card"><div class="kpi-title">Total Expenses</div><div class="kpi-value">'+currency(k.totalExpenses)+'</div></div>'+
+    '<div class="kpi-card">' +
+      '<div class="kpi-title">Total Expenses</div>' +
+      '<div class="kpi-value">'+currency(k.totalExpenses)+'</div>' +
+    '</div>'+
 
-  '<div class="kpi-card"><div class="kpi-title">Operating Cost</div><div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div></div>'+
+    '<div class="kpi-card">' +
+      '<div class="kpi-title">Operating Cost</div>' +
+      '<div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div>' +
+    '</div>'+
 
-  custodyCard;
+    custodyCard;
 }
 function renderCustody(c){
   document.getElementById("custodySection").innerHTML=
