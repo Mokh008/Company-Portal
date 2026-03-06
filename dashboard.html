@@ -111,14 +111,6 @@ select{
 .kpi-title{font-size:13px;color:var(--muted);}
 .kpi-value{font-size:24px;margin-top:8px;font-weight:600;}
 .section-title{margin:40px 0 15px;}
-.tabs{display:flex;gap:10px;margin-bottom:20px;}
-.tab-btn{
-  padding:8px 16px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  cursor:pointer;
-}
-.tab-btn.active{border-color:var(--accent);}
 .charts{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
@@ -135,6 +127,12 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 .rank1{color:#facc15;font-weight:bold;}
 .rank2{color:#cbd5e1;}
 .rank3{color:#f87171;}
+.top5-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:20px;
+}
 .loader-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.6);
   display:none;justify-content:center;align-items:center;z-index:2000;
@@ -157,533 +155,547 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 
 <div class="main" id="dashboardContent">
 
-<div class="header">
-  <div id="userInfo"></div>
-  <div class="controls">
-    <button onclick="toggleTheme()">Theme</button>
-    <button onclick="exportPDF()">PDF</button>
-    <button onclick="logout()">Logout</button>
+  <div class="header">
+    <div id="userInfo"></div>
+    <div class="controls">
+      <button onclick="toggleTheme()">Theme</button>
+      <button onclick="exportPDF()">PDF</button>
+      <button onclick="logout()">Logout</button>
+    </div>
   </div>
+
+  <!-- ===== ADMIN FILTERS ===== -->
+  <div class="kpis">
+
+    <div class="kpi-card">
+      <div class="kpi-title">Month (Administrative)</div>
+      <select id="monthFilter" onchange="loadAdminData()"></select>
+    </div>
+
+    <!-- Sector filter: Admin only -->
+    <div class="kpi-card" id="adminSectorCard" style="display:none;">
+      <div class="kpi-title">Sector (Administrative)</div>
+      <select id="adminSectorFilter" onchange="loadAdminData()">
+        <option value="">All</option>
+        <option value="Traditional">Traditional</option>
+        <option value="Mechanical">Mechanical</option>
+      </select>
+    </div>
+
+  </div>
+
+  <!-- Projects shortcuts -->
+  <div id="projectsSection" class="projects"></div>
+
+  <!-- KPI cards (Rent / Expenses / Operating Cost / Custody[admin only]) -->
+  <div id="kpiSection" class="kpis"></div>
+
+  <!-- ===== ADMIN CHARTS ===== -->
+  <h3 class="section-title">Administrative Charts</h3>
+  <div id="adminCharts" class="charts">
+
+    <div class="chart-card">
+      <h3>Rent vs Expenses</h3>
+      <canvas id="adminRentChart"></canvas>
+    </div>
+
+    <!-- Employee chart: admin & sector_manager only -->
+    <div class="chart-card" id="adminEmployeeCard">
+      <h3>Employee Activity</h3>
+      <canvas id="adminEmployeeChart"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ===== SUPPLY SECTION ===== -->
+  <h2 class="section-title">Supply Performance</h2>
+
+  <div class="kpis">
+
+    <div class="kpi-card">
+      <div class="kpi-title">Select Date (Supply)</div>
+      <input type="date"
+             id="supplyDateFilter"
+             onchange="loadSupplyData()"
+             onkeydown="return false"
+             onpaste="return false"
+             style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
+    </div>
+
+    <!-- Sector filter: Admin only -->
+    <div class="kpi-card" id="supplySectorCard" style="display:none;">
+      <div class="kpi-title">Sector (Supply)</div>
+      <select id="sectorFilter" onchange="loadSupplyData()">
+        <option value="">All</option>
+        <option value="Traditional">Traditional</option>
+        <option value="Mechanical">Mechanical</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div id="supplyKPIs" class="kpis"></div>
+
+  <!-- Top 5 tables -->
+  <div id="top5Section"></div>
+
+  <!-- ===== SUPPLY CHARTS ===== -->
+  <h3 class="section-title">Supply Charts</h3>
+  <div id="supplyCharts" class="charts">
+
+    <div class="chart-card">
+      <h3>Plan vs Actual</h3>
+      <canvas id="supplyPlanChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Sugar %</h3>
+      <canvas id="supplySugarChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Tare %</h3>
+      <canvas id="supplyTareChart"></canvas>
+    </div>
+
+  </div>
+
+</div><!-- end .main -->
+
+<div id="loaderOverlay" class="loader-overlay">
+  <div class="spinner"></div>
 </div>
 
-<!-- ADMIN FILTERS -->
-<div class="kpis">
-
-  <div class="kpi-card">
-    <div class="kpi-title">Month (Administrative)</div>
-    <select id="monthFilter" onchange="loadAdminData()"></select>
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-title">Sector (Administrative)</div>
-    <select id="adminSectorFilter" onchange="loadAdminData()">
-      <option value="">All</option>
-      <option value="Traditional">Traditional</option>
-      <option value="Mechanical">Mechanical</option>
-    </select>
-  </div>
-
-</div>
-
-<div id="projectsSection" class="projects"></div>
-<div id="kpiSection" class="kpis"></div>
-<div id="custodySection"></div>
-<!-- ================= ADMIN CHARTS ================= -->
-
-<h3 class="section-title">Administrative Charts</h3>
-<div id="adminCharts" class="charts">
-  <div class="chart-card">
-    <h3>Rent vs Expenses</h3>
-    <canvas id="adminRentChart"></canvas>
-  </div>
-
-  <div class="chart-card">
-    <h3>Employee Activity</h3>
-    <canvas id="adminEmployeeChart"></canvas>
-  </div>
-</div>
-
-<h2 class="section-title">Supply Performance</h2>
-  
-<!-- SUPPLY FILTERS (يومي + قطاع) -->
-<div class="kpis">
-  <div class="kpi-card">
-    <div class="kpi-title">Select Date (Supply)</div>
-    <input type="date"
-       id="supplyDateFilter"
-       onchange="loadSupplyData()"
-       onkeydown="return false"
-       onpaste="return false"
-       style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
-  </div>
-
-  <div class="kpi-card">
-    <div class="kpi-title">Sector (Supply)</div>
-    <select id="sectorFilter" onchange="loadSupplyData()">
-      <option value="">All</option>
-      <option value="Traditional">Traditional</option>
-      <option value="Mechanical">Mechanical</option>
-    </select>
-  </div>
-</div>
-
-<div id="supplyKPIs" class="kpis"></div>
-<div id="top5Section" class="kpis"></div>
-
-
-<!-- ================= SUPPLY CHARTS ================= -->
-
-<h3 class="section-title">Supply Charts</h3>
-<div id="supplyCharts" class="charts">
-  <div class="chart-card">
-    <h3>Plan vs Actual</h3>
-    <canvas id="supplyPlanChart"></canvas>
-  </div>
-
-  <div class="chart-card">
-    <h3>Sugar %</h3>
-    <canvas id="supplySugarChart"></canvas>
-  </div>
-
-  <div class="chart-card">
-    <h3>Tare %</h3>
-    <canvas id="supplyTareChart"></canvas>
-  </div>
-</div>
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbzQa423cyJeTtqrIzdDbicYyiWCem3KwK7j0vPi8-RyPz6cs8EdBRpjx9JcO0e0Jq2_/exec";
-const user=JSON.parse(localStorage.getItem("user"));
-if(!user) window.location.href="index.html";
+// =====================================================
+// ================= BOOTSTRAP =========================
+// =====================================================
 
-document.getElementById("userInfo").innerText =
-user.name+" • "+user.role+" • "+(user.sector||"");
+const API_URL = "https://script.google.com/macros/s/AKfycbyrOUshmUD3vytP96Q6Atd9G4OrxclPhnmMisSguk2BaB84F24myQ9hDDO4kp1fMu8V/exec";
 
-let currentTab="today";
-let rentChart,employeeChart,supplyChart,sugarChart,tareChart;
-let sectorCharts=[];
+// Redirect to login if no user in localStorage
+const user = JSON.parse(localStorage.getItem("user"));
+if (!user) window.location.href = "index.html";
 
-function buildAdminMonthFilter(){
+// =====================================================
+// ================= ROLE HELPERS ======================
+// =====================================================
 
+const role = String(user.role || "").toLowerCase();
+
+const isAdmin        = role === "admin";
+const isSectorMgr    = role === "sector_manager";
+const isManager      = role === "manager";
+const isEngineer     = role === "engineer";
+
+// =====================================================
+// ================= CHART INSTANCES ===================
+// =====================================================
+
+let adminRentChart     = null;
+let adminEmployeeChart = null;
+let supplyPlanChart    = null;
+let supplySugarChart   = null;
+let supplyTareChart    = null;
+
+// =====================================================
+// ================= UI HELPERS ========================
+// =====================================================
+
+function currency(n) { return new Intl.NumberFormat().format(n || 0); }
+function showLoader() { document.getElementById("loaderOverlay").style.display = "flex"; }
+function hideLoader() { document.getElementById("loaderOverlay").style.display = "none"; }
+function toggleTheme() { document.body.classList.toggle("light"); }
+function logout() { localStorage.removeItem("user"); window.location.href = "index.html"; }
+function exportPDF() { html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf"); }
+
+function getProfessionalOptions() {
+  return { responsive: true, maintainAspectRatio: true, aspectRatio: 2 };
+}
+
+// =====================================================
+// ================= INIT ==============================
+// =====================================================
+
+window.addEventListener("DOMContentLoaded", function () {
+
+  // Show user info
+  document.getElementById("userInfo").innerText =
+    user.name + " • " + user.role + (user.sector ? " • " + user.sector : "");
+
+  // Show admin-only UI elements
+  if (isAdmin) {
+    document.getElementById("adminSectorCard").style.display  = "";
+    document.getElementById("supplySectorCard").style.display = "";
+  }
+
+  // Hide employee chart for plain managers and engineers
+  if (isManager || isEngineer) {
+    document.getElementById("adminEmployeeCard").style.display = "none";
+  }
+
+  renderProjects();
+  buildAdminMonthFilter();
+
+  // Small delay to let month filter render before first call
+  setTimeout(() => loadAdminData(), 100);
+
+  // Supply date default = today
+  const dateInput = document.getElementById("supplyDateFilter");
+  if (!dateInput.value) {
+    dateInput.value = new Date().toISOString().split("T")[0];
+  }
+
+  loadSupplyData();
+
+  // Auto-refresh supply every 60s
+  setInterval(() => loadSupplyData(), 60000);
+});
+
+// =====================================================
+// ================= PROJECTS ==========================
+// =====================================================
+
+function renderProjects() {
+  const p = document.getElementById("projectsSection");
+  p.innerHTML = "";
+
+  function add(title, link) {
+    const d = document.createElement("div");
+    d.className = "project-card";
+    d.innerHTML = "<h3>" + title + "</h3>";
+    d.onclick = () => window.open(link, "_blank");
+    p.appendChild(d);
+  }
+
+  add("Attendance", "https://mokh008.github.io/Attendance-Login/");
+  add("Expenses",   "https://mokh008.github.io/Expenses-System/");
+  add("Rentals",    "https://mokh008.github.io/Rent-Payment-UI/");
+}
+
+// =====================================================
+// ================= MONTH FILTER ======================
+// =====================================================
+
+function buildAdminMonthFilter() {
   const select = document.getElementById("monthFilter");
-  if(!select) return;
+  if (!select) return;
 
   select.innerHTML = "";
 
-  // All option
-  const allOption = document.createElement("option");
-  allOption.value = "";
-  allOption.textContent = "All";
-  select.appendChild(allOption);
+  // "All" option
+  const allOpt = document.createElement("option");
+  allOpt.value = "";
+  allOpt.textContent = "All";
+  select.appendChild(allOpt);
 
   const now = new Date();
 
-  // آخر 18 شهر
-  for(let i=0;i<18;i++){
+  for (let i = 0; i < 18; i++) {
+    const d     = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year  = d.getFullYear();
 
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-
-    const month = String(d.getMonth()+1).padStart(2,'0');
-    const year = d.getFullYear();
-
-    const option = document.createElement("option");
-    option.value = month + "-" + year;
-
-    option.textContent =
-      d.toLocaleString('default', { month: 'long' }) + " " + year;
-
-    select.appendChild(option);
+    const opt = document.createElement("option");
+    opt.value = month + "-" + year;
+    opt.textContent = d.toLocaleString("default", { month: "long" }) + " " + year;
+    select.appendChild(opt);
   }
 
-  // نخلي الشهر الحالي default
-  const currentValue =
-    String(now.getMonth()+1).padStart(2,'0') + "-" + now.getFullYear();
-
-  select.value = currentValue;
+  // Default = current month
+  select.value = String(now.getMonth() + 1).padStart(2, "0") + "-" + now.getFullYear();
 }
-function currency(n){return new Intl.NumberFormat().format(n||0);}
-function showLoader(){document.getElementById("loaderOverlay").style.display="flex";}
-function hideLoader(){document.getElementById("loaderOverlay").style.display="none";}
 
-function switchTab(tab,e){
-  currentTab=tab;
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  e.target.classList.add("active");
-  loadData();
-}
-function loadAdminData(){
+// =====================================================
+// ================= LOAD ADMIN DATA ===================
+// =====================================================
 
+function loadAdminData() {
   showLoader();
 
-  const month = document.getElementById("monthFilter")?.value || "";
-let sector = "";
+  const month  = document.getElementById("monthFilter")?.value || "";
+  // sector filter only sent if admin (backend ignores it for others anyway,
+  // but we keep the UI clean)
+  const sector = isAdmin
+    ? (document.getElementById("adminSectorFilter")?.value || "")
+    : "";
 
-if(user.role === "admin"){
-  sector = document.getElementById("adminSectorFilter")?.value || "";
-}else{
-  sector = user.sector || "";
-}
-  fetch(API_URL,{
-    method:"POST",
+  fetch(API_URL, {
+    method: "POST",
     body: JSON.stringify({
-      action:"adminAnalytics",
-      user:user,
-      filters:{ month, sector }
+      action:  "adminAnalytics",
+      user:    user,
+      filters: { month, sector }
     })
   })
   .then(res => res.json())
   .then(data => {
+    if (!data || data.success === false) throw new Error(data?.error || "Admin API error");
 
-    if(!data || data.success === false){
-      throw new Error(data?.error || "Admin API error");
-    }
+    if (data.kpis)        renderKPIs(data.kpis);
+    if (data.adminCharts) renderAdminCharts(data.adminCharts);
 
-if(data.kpis)
-  renderKPIs(data.kpis);
-
-if(data.adminCharts)
-  renderAdminCharts(data.adminCharts);
-    
     hideLoader();
   })
-  .catch(err=>{
+  .catch(err => {
     hideLoader();
     alert("Admin error: " + err.message);
   });
 }
-  function loadSupplyData(){
 
+// =====================================================
+// ================= RENDER KPIs =======================
+// =====================================================
+
+/**
+ * Renders Rent / Expenses / Operating Cost cards.
+ * Custody card is shown ONLY for admin, and only if kpis.custody exists.
+ */
+function renderKPIs(k) {
+  let html = `
+    <div class="kpi-card">
+      <div class="kpi-title">Total Rent</div>
+      <div class="kpi-value">${currency(k.totalRent)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Total Expenses</div>
+      <div class="kpi-value">${currency(k.totalExpenses)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Operating Cost</div>
+      <div class="kpi-value">${currency(k.monthlyOperatingCost)}</div>
+    </div>
+  `;
+
+  // Custody: admin only — backend only sends it for admin
+  if (isAdmin && k.custody) {
+    html += `
+      <div class="kpi-card">
+        <div class="kpi-title">Custody Balance</div>
+        <div class="kpi-value">${currency(k.custody.currentBalance)}</div>
+      </div>
+    `;
+  }
+
+  document.getElementById("kpiSection").innerHTML = html;
+}
+
+// =====================================================
+// ================= RENDER ADMIN CHARTS ===============
+// =====================================================
+
+function renderAdminCharts(data) {
+  if (!data) return;
+
+  // Destroy old charts safely
+  if (adminRentChart     instanceof Chart) adminRentChart.destroy();
+  if (adminEmployeeChart instanceof Chart) adminEmployeeChart.destroy();
+
+  // Rent vs Expenses — visible to everyone
+  adminRentChart = new Chart(
+    document.getElementById("adminRentChart"),
+    {
+      type: "bar",
+      data: {
+        labels: ["Rent", "Expenses"],
+        datasets: [{ label: "Amount", data: [data.rent || 0, data.expenses || 0], borderRadius: 12 }]
+      },
+      options: getProfessionalOptions()
+    }
+  );
+
+  // Employee Activity — admin & sector_manager only
+  if (isAdmin || isSectorMgr) {
+    adminEmployeeChart = new Chart(
+      document.getElementById("adminEmployeeChart"),
+      {
+        type: "bar",
+        data: {
+          labels: (data.employees || []).map(e => e.name),
+          datasets: [{ label: "Attendance", data: (data.employees || []).map(e => e.count), borderRadius: 10 }]
+        },
+        options: getProfessionalOptions()
+      }
+    );
+  }
+}
+
+// =====================================================
+// ================= LOAD SUPPLY DATA ==================
+// =====================================================
+
+function loadSupplyData() {
   showLoader();
 
   const dateInput = document.getElementById("supplyDateFilter");
-  const date = dateInput?.value || "";
-let sector = "";
+  const date      = dateInput?.value || "";
+  const sector    = isAdmin ? (document.getElementById("sectorFilter")?.value || "") : "";
 
-if(user.role === "admin"){
-  sector = document.getElementById("sectorFilter")?.value || "";
-}else{
-  sector = user.sector || "";
-}
-  fetch(API_URL,{
-    method:"POST",
+  fetch(API_URL, {
+    method: "POST",
     body: JSON.stringify({
-      action:"supplyAnalytics",
-      user:user,
-      filters:{ date, sector }
+      action:  "supplyAnalytics",
+      user:    user,
+      filters: { date, sector }
     })
   })
   .then(res => res.json())
   .then(data => {
+    if (!data || data.success === false) throw new Error(data?.error || "Supply API error");
 
-    if(!data || data.success === false){
-      throw new Error(data?.error || "Supply API error");
-    }
-
-    // 🔥 لو السيرفر اختار تاريخ تلقائي، ظبطه في الـ Date Picker
-    if(!date && data.supplySummary?.selectedDate){
+    // If backend chose a date automatically, sync it to the picker
+    if (!date && data.supplySummary?.selectedDate) {
       dateInput.value = data.supplySummary.selectedDate;
     }
 
-    if(data.supplySummary)
-      renderSupply(data.supplySummary);
+    if (data.supplySummary) {
+      renderSupplyKPIs(data.supplySummary);
+      renderSupplyCharts(data.supplySummary);
+    }
 
-    if(data.supplyTop5)
+    if (data.supplyTop5) {
       renderTop5(data.supplyTop5);
+    }
 
-if(data.supplySummary){
-  renderSupplyChartsFromSummary(data.supplySummary);
-}
     hideLoader();
   })
-  .catch(err=>{
+  .catch(err => {
     hideLoader();
     alert("Supply error: " + err.message);
   });
 }
-function renderProjects(){
-  const p=document.getElementById("projectsSection");
-  p.innerHTML="";
-  function add(title,link){
-    const d=document.createElement("div");
-    d.className="project-card";
-    d.innerHTML="<h3>"+title+"</h3>";
-    d.onclick=()=>window.open(link,"_blank");
-    p.appendChild(d);
-  }
-  add("Attendance","https://mokh008.github.io/Attendance-Login/");
-  add("Expenses","https://mokh008.github.io/Expenses-System/");
-  add("Rentals","https://mokh008.github.io/Rent-Payment-UI/");
-}
 
-function renderKPIs(k){
+// =====================================================
+// ================= RENDER SUPPLY KPIs ================
+// =====================================================
 
-  let custodyCard = "";
+function renderSupplyKPIs(data) {
+  if (!data || !data.today || !data.toDate) return;
 
-  if(user.role === "admin"){
-    custodyCard =
-      '<div class="kpi-card">' +
-      '<div class="kpi-title">Custody Balance</div>' +
-      '<div class="kpi-value">'+currency(k.custody.currentBalance)+'</div>' +
-      '</div>';
-  }
-
-  document.getElementById("kpiSection").innerHTML =
-
-    '<div class="kpi-card">' +
-      '<div class="kpi-title">Total Rent</div>' +
-      '<div class="kpi-value">'+currency(k.totalRent)+'</div>' +
-    '</div>'+
-
-    '<div class="kpi-card">' +
-      '<div class="kpi-title">Total Expenses</div>' +
-      '<div class="kpi-value">'+currency(k.totalExpenses)+'</div>' +
-    '</div>'+
-
-    '<div class="kpi-card">' +
-      '<div class="kpi-title">Operating Cost</div>' +
-      '<div class="kpi-value">'+currency(k.monthlyOperatingCost)+'</div>' +
-    '</div>'+
-
-    custodyCard;
-}
-function renderCustody(c){
-  document.getElementById("custodySection").innerHTML=
-  '<div class="kpis"><div class="kpi-card"><div class="kpi-title">Custody Balance</div><div class="kpi-value">'+currency(c.currentBalance)+'</div></div></div>';
-}
-
-function renderSupply(data){
-
-  if(!data || !data.today || !data.toDate) return;
-
-  const today = data.today;
+  const today  = data.today;
   const toDate = data.toDate;
 
-  const achToday = today.totalQuota 
-      ? ((today.totalDelivered / today.totalQuota) * 100).toFixed(1)
-      : "0.0";
-
-  const achToDate = toDate.totalQuota 
-      ? ((toDate.totalDelivered / toDate.totalQuota) * 100).toFixed(1)
-      : "0.0";
+  const achToday  = today.totalQuota  ? ((today.totalDelivered  / today.totalQuota)  * 100).toFixed(1) : "0.0";
+  const achToDate = toDate.totalQuota ? ((toDate.totalDelivered / toDate.totalQuota) * 100).toFixed(1) : "0.0";
 
   document.getElementById("supplyKPIs").innerHTML = `
 
     <!-- TODAY -->
-
     <div class="kpi-card">
       <div class="kpi-title">Quota (Today)</div>
       <div class="kpi-value">${today.totalQuota || 0}</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Delivered (Today)</div>
       <div class="kpi-value">
         ${today.totalDelivered || 0}
-        <div style="font-size:13px;color:var(--muted);margin-top:6px;">
-          Net: ${today.totalNet || 0}
-        </div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${today.totalNet || 0}</div>
       </div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Achievement % (Today)</div>
       <div class="kpi-value">${achToday}%</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Avg Sugar (Today)</div>
       <div class="kpi-value">${(today.avgSugar || 0).toFixed(2)}%</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Avg Tare (Today)</div>
       <div class="kpi-value">${(today.avgTare || 0).toFixed(2)}%</div>
     </div>
 
     <!-- TO DATE -->
-
     <div class="kpi-card">
       <div class="kpi-title">Quota (To Date)</div>
       <div class="kpi-value">${toDate.totalQuota || 0}</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Delivered (To Date)</div>
       <div class="kpi-value">
         ${toDate.totalDelivered || 0}
-        <div style="font-size:13px;color:var(--muted);margin-top:6px;">
-          Net: ${toDate.totalNet || 0}
-        </div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${toDate.totalNet || 0}</div>
       </div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Achievement % (To Date)</div>
       <div class="kpi-value">${achToDate}%</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Avg Sugar (To Date)</div>
       <div class="kpi-value">${(toDate.avgSugar || 0).toFixed(2)}%</div>
     </div>
-
     <div class="kpi-card">
       <div class="kpi-title">Avg Tare (To Date)</div>
       <div class="kpi-value">${(toDate.avgTare || 0).toFixed(2)}%</div>
     </div>
-
   `;
 }
-  function renderTop5(data){
 
-  if(!data || !data.today || !data.toDate) return;
+// =====================================================
+// ================= RENDER TOP 5 ======================
+// =====================================================
 
-  function buildCard(title, rows, field){
+function renderTop5(data) {
+  if (!data || !data.today || !data.toDate) return;
 
-    if(!rows || !rows.length) return "";
+  function buildCard(title, rows, field) {
+    if (!rows || !rows.length) return "";
 
-    let html = `
-      <div class="kpi-card">
-        <h4>${title}</h4>
-        <table>
-    `;
+    let html = `<div class="kpi-card"><h4>${title}</h4><table>`;
 
-    rows.forEach((r,i)=>{
-
-      let cls = i===0 ? "rank1" :
-                i===1 ? "rank2" :
-                i===2 ? "rank3" : "";
-
-      html += `
-        <tr class="${cls}">
-          <td>${i+1}. ${r.engineer}</td>
-          <td>${(r[field] || 0).toFixed(2)}</td>
-        </tr>
-      `;
+    rows.forEach((r, i) => {
+      const cls = i === 0 ? "rank1" : i === 1 ? "rank2" : i === 2 ? "rank3" : "";
+      html += `<tr class="${cls}"><td>${i + 1}. ${r.engineer}</td><td>${(r[field] || 0).toFixed(2)}</td></tr>`;
     });
 
     html += "</table></div>";
-
     return html;
   }
 
-  let html = `
-
-    <!-- TODAY -->
+  document.getElementById("top5Section").innerHTML = `
+    <h3 class="section-title">Top 5 — Today</h3>
     <div class="top5-row">
-      ${buildCard("Top 5 Ton (Today)", data.today.topTons, "tons")}
+      ${buildCard("Top 5 Ton (Today)",   data.today.topTons,  "tons")}
       ${buildCard("Top 5 Sugar (Today)", data.today.topSugar, "sugar")}
-      ${buildCard("Top 5 Tare (Today)", data.today.topTare, "tare")}
+      ${buildCard("Top 5 Tare (Today)",  data.today.topTare,  "tare")}
     </div>
 
-    <!-- TO DATE -->
-    <div class="top5-row" style="margin-top:30px;">
-      ${buildCard("Top 5 Ton (To Date)", data.toDate.topTons, "tons")}
+    <h3 class="section-title">Top 5 — To Date</h3>
+    <div class="top5-row">
+      ${buildCard("Top 5 Ton (To Date)",   data.toDate.topTons,  "tons")}
       ${buildCard("Top 5 Sugar (To Date)", data.toDate.topSugar, "sugar")}
-      ${buildCard("Top 5 Tare (To Date)", data.toDate.topTare, "tare")}
+      ${buildCard("Top 5 Tare (To Date)",  data.toDate.topTare,  "tare")}
     </div>
   `;
-
-  document.getElementById("top5Section").innerHTML = html;
 }
-  
-function renderAdminCharts(data){
 
-  if(!data) return;
+// =====================================================
+// ================= RENDER SUPPLY CHARTS ==============
+// =====================================================
 
-  // destroy safely
-  if (window.adminRentChart instanceof Chart) {
-    window.adminRentChart.destroy();
-  }
+function renderSupplyCharts(summary) {
+  if (!summary) return;
 
-  if (window.adminEmployeeChart instanceof Chart) {
-    window.adminEmployeeChart.destroy();
-  }
+  const today    = summary.today;
+  const quota    = today.totalQuota    || 0;
+  const delivered= today.totalDelivered|| 0;
+  const sugar    = today.avgSugar      || 0;
+  const tare     = today.avgTare       || 0;
 
-  // Rent vs Expenses
-  window.adminRentChart = new Chart(
-    document.getElementById("adminRentChart"),
-    {
-      type:"bar",
-      data:{
-        labels:["Rent","Expenses"],
-        datasets:[{
-          label:"Amount",
-          data:[data.rent || 0, data.expenses || 0],
-          borderRadius:12
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:true,
-        aspectRatio:2
-      }
-    }
-  );
-
-  // Employee Activity (Admin + Sector Manager only)
-if(user.role === "admin" || user.role === "sector_manager"){
-
-  window.adminEmployeeChart = new Chart(
-    document.getElementById("adminEmployeeChart"),
-    {
-      type:"bar",
-      data:{
-        labels:(data.employees || []).map(e=>e.name),
-        datasets:[{
-          label:"Attendance",
-          data:(data.employees || []).map(e=>e.count),
-          borderRadius:10
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:true,
-        aspectRatio:2
-      }
-    }
-  );
-
-}else{
-  // اخفي الكارت بالكامل
-  document.getElementById("adminEmployeeChart").parentElement.style.display = "none";
-}
-  
-}
-  // ================= ADMIN CHARTS =================
-
-let adminRentChart = null;
-let adminEmployeeChart = null;
-
-// ================= SUPPLY CHARTS =================
-
-let supplyPlanChart = null;
-let supplySugarChart = null;
-let supplyTareChart = null;
-
-function renderSupplyCharts(sec){
-
-  if(!sec || Object.keys(sec).length === 0) return;
-
-  const sectors = Object.keys(sec);
-
-  const quota = sectors.map(s => sec[s].quota || 0);
-  const delivered = sectors.map(s => sec[s].delivered || 0);
-  const sugar = sectors.map(s => sec[s].avgSugar || 0);
-  const tare = sectors.map(s => sec[s].avgTare || 0);
-
-  if(supplyPlanChart) supplyPlanChart.destroy();
-  if(supplySugarChart) supplySugarChart.destroy();
-  if(supplyTareChart) supplyTareChart.destroy();
+  if (supplyPlanChart)  supplyPlanChart.destroy();
+  if (supplySugarChart) supplySugarChart.destroy();
+  if (supplyTareChart)  supplyTareChart.destroy();
 
   supplyPlanChart = new Chart(
     document.getElementById("supplyPlanChart"),
     {
       type: "bar",
       data: {
-        labels: sectors,
+        labels: ["Today"],
         datasets: [
-          { label: "Quota", data: quota, borderRadius: 10 },
-          { label: "Delivered", data: delivered, borderRadius: 10 }
+          { label: "Quota",     data: [quota],     borderRadius: 10 },
+          { label: "Delivered", data: [delivered], borderRadius: 10 }
         ]
       },
       options: getProfessionalOptions()
@@ -695,15 +707,8 @@ function renderSupplyCharts(sec){
     {
       type: "line",
       data: {
-        labels: sectors,
-        datasets: [
-          {
-            label: "Sugar %",
-            data: sugar,
-            tension: 0.4,
-            fill: true
-          }
-        ]
+        labels: ["Today"],
+        datasets: [{ label: "Sugar %", data: [sugar], tension: .4, fill: true }]
       },
       options: getProfessionalOptions()
     }
@@ -714,131 +719,13 @@ function renderSupplyCharts(sec){
     {
       type: "line",
       data: {
-        labels: sectors,
-        datasets: [
-          {
-            label: "Tare %",
-            data: tare,
-            tension: 0.4,
-            fill: true
-          }
-        ]
+        labels: ["Today"],
+        datasets: [{ label: "Tare %", data: [tare], tension: .4, fill: true }]
       },
       options: getProfessionalOptions()
     }
   );
 }
-}
-  
-function renderSupplyChartsFromSummary(summary){
-
-  if(!summary) return;
-
-  const today = summary.today;
-
-  const quota = today.totalQuota || 0;
-  const delivered = today.totalDelivered || 0;
-  const sugar = today.avgSugar || 0;
-  const tare = today.avgTare || 0;
-
-  if(supplyPlanChart) supplyPlanChart.destroy();
-  if(supplySugarChart) supplySugarChart.destroy();
-  if(supplyTareChart) supplyTareChart.destroy();
-
-  supplyPlanChart = new Chart(
-    document.getElementById("supplyPlanChart"),
-    {
-      type:"bar",
-      data:{
-        labels:["Today"],
-        datasets:[
-          {label:"Quota",data:[quota],borderRadius:10},
-          {label:"Delivered",data:[delivered],borderRadius:10}
-        ]
-      },
-      options:getProfessionalOptions()
-    }
-  );
-
-  supplySugarChart = new Chart(
-    document.getElementById("supplySugarChart"),
-    {
-      type:"line",
-      data:{
-        labels:["Today"],
-        datasets:[
-          {label:"Sugar %",data:[sugar],tension:.4,fill:true}
-        ]
-      },
-      options:getProfessionalOptions()
-    }
-  );
-
-  supplyTareChart = new Chart(
-    document.getElementById("supplyTareChart"),
-    {
-      type:"line",
-      data:{
-        labels:["Today"],
-        datasets:[
-          {label:"Tare %",data:[tare],tension:.4,fill:true}
-        ]
-      },
-      options:getProfessionalOptions()
-    }
-  );
-}  
-function getProfessionalOptions(){
-  return {
-    responsive: true,
-    maintainAspectRatio: true,   // 👈 أهم سطر
-    aspectRatio: 2               // 👈 بيخلي الارتفاع طبيعي
-  };
-}function toggleTheme(){document.body.classList.toggle("light");}
-function logout(){localStorage.removeItem("user");window.location.href="index.html";}
-function exportPDF(){html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf");}
-
-window.addEventListener("DOMContentLoaded", function(){
-
-  // 🔐 Hide Sector Filters for non-admin
-  if(user.role !== "admin"){
-
-    const adminSector = document.getElementById("adminSectorFilter");
-    const supplySector = document.getElementById("sectorFilter");
-
-    if(adminSector){
-      adminSector.parentElement.style.display = "none";
-    }
-
-    if(supplySector){
-      supplySector.parentElement.style.display = "none";
-    }
-  }
-
-  renderProjects();
-  buildAdminMonthFilter();
-
-  setTimeout(() => {
-    loadAdminData();
-  }, 100);
-  // AUTO SUPPLY DATE
-  const dateInput = document.getElementById("supplyDateFilter");
-
-  if(!dateInput.value){
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.value = today;
-  }
-
-  loadSupplyData();
-
-  setInterval(() => {
-    loadSupplyData();
-  }, 60000);
-
-});
 </script>
-<div id="loaderOverlay" class="loader-overlay">
-  <div class="spinner"></div>
-</div>
 </body>
 </html>
