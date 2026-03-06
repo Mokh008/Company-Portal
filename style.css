@@ -6,7 +6,7 @@
   --accent2:#0ea5e9;
   --accent-glow:rgba(45,212,191,.35);
   --text:#f1f5f9;
-  --muted:#94a3b8;َ
+  --muted:#94a3b8;
   --border:#1f2937;
   --danger:#f87171;
 }
@@ -53,9 +53,8 @@ linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
 linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
 background-size:40px 40px;
 pointer-events:none;
-z-index:0;
+z-index:-1;
 }
-
 /* ================================================= */
 /* ================= LOGIN PAGE ===================== */
 /* ================================================= */
@@ -430,13 +429,6 @@ padding:30px;
 /* ================================================= */
 /* =============== MK NEXUS STARFALL =============== */
 /* ================================================= */
-
-/* Background base */
-
-body{
-background:#0b0f19;
-overflow-x:hidden;
-}
 
 /* Star container */
 
