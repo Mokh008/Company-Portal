@@ -389,8 +389,8 @@ if(user.role === "admin"){
     if(data.supplyTop5)
       renderTop5(data.supplyTop5);
 
-if(data.sectorComparison){
-  renderSupplyCharts(data.sectorComparison);
+if(data.supplySummary){
+  renderSupplyChartsFromSummary(data.supplySummary);
 }
     hideLoader();
   })
@@ -728,6 +728,66 @@ function renderSupplyCharts(sec){
     }
   );
 }
+}
+  
+function renderSupplyChartsFromSummary(summary){
+
+  if(!summary) return;
+
+  const today = summary.today;
+
+  const quota = today.totalQuota || 0;
+  const delivered = today.totalDelivered || 0;
+  const sugar = today.avgSugar || 0;
+  const tare = today.avgTare || 0;
+
+  if(supplyPlanChart) supplyPlanChart.destroy();
+  if(supplySugarChart) supplySugarChart.destroy();
+  if(supplyTareChart) supplyTareChart.destroy();
+
+  supplyPlanChart = new Chart(
+    document.getElementById("supplyPlanChart"),
+    {
+      type:"bar",
+      data:{
+        labels:["Today"],
+        datasets:[
+          {label:"Quota",data:[quota],borderRadius:10},
+          {label:"Delivered",data:[delivered],borderRadius:10}
+        ]
+      },
+      options:getProfessionalOptions()
+    }
+  );
+
+  supplySugarChart = new Chart(
+    document.getElementById("supplySugarChart"),
+    {
+      type:"line",
+      data:{
+        labels:["Today"],
+        datasets:[
+          {label:"Sugar %",data:[sugar],tension:.4,fill:true}
+        ]
+      },
+      options:getProfessionalOptions()
+    }
+  );
+
+  supplyTareChart = new Chart(
+    document.getElementById("supplyTareChart"),
+    {
+      type:"line",
+      data:{
+        labels:["Today"],
+        datasets:[
+          {label:"Tare %",data:[tare],tension:.4,fill:true}
+        ]
+      },
+      options:getProfessionalOptions()
+    }
+  );
+}  
 function getProfessionalOptions(){
   return {
     responsive: true,
