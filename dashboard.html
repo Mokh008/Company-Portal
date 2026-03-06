@@ -640,10 +640,8 @@ function renderTop5(data) {
 // =====================================================
 // ================= RENDER SUPPLY CHARTS ==============
 // =====================================================
-
 function renderSupplyCharts(summary) {
   if (!summary) return;
-
   const today     = summary.today;
   const quota     = today.totalQuota     || 0;
   const delivered = today.totalDelivered || 0;
@@ -654,38 +652,96 @@ function renderSupplyCharts(summary) {
   if (supplySugarChart instanceof Chart) supplySugarChart.destroy();
   if (supplyTareChart  instanceof Chart) supplyTareChart.destroy();
 
-  supplyPlanChart = new Chart(
-    document.getElementById("supplyPlanChart"),
-    {
-      type: "bar",
-      data: {
-        labels: ["Today"],
-        datasets: [
-          { label: "Quota",     data: [quota],     borderRadius: 10 },
-          { label: "Delivered", data: [delivered], borderRadius: 10 }
-        ]
-      },
-      options: getProfessionalOptions()
+  // Plan vs Actual — Bar
+  supplyPlanChart = new Chart(document.getElementById("supplyPlanChart"), {
+    type: "bar",
+    data: {
+      labels: ["Quota", "Delivered"],
+      datasets: [{
+        data: [quota, delivered],
+        backgroundColor: ["#2dd4bf", "#f87171"],
+        borderRadius: 10
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
     }
-  );
+  });
 
-  supplySugarChart = new Chart(
-    document.getElementById("supplySugarChart"),
-    {
-      type: "line",
-      data: { labels: ["Today"], datasets: [{ label: "Sugar %", data: [sugar], tension: .4, fill: true }] },
-      options: getProfessionalOptions()
-    }
-  );
+  // Sugar % — Gauge
+  const sugarMax   = 25;
+  const sugarMin   = 10;
+  const sugarColor = sugar >= 17 ? "#4ade80" : sugar >= 14 ? "#facc15" : "#f87171";
+  supplySugarChart = new Chart(document.getElementById("supplySugarChart"), {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: [sugar - sugarMin, sugarMax - sugar],
+        backgroundColor: [sugarColor, "#1f2937"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      circumference: 180,
+      rotation: -90,
+      cutout: "75%",
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    },
+    plugins: [{
+      id: "sugarText",
+      beforeDraw(chart) {
+        const { ctx, chartArea: { top, width, height } } = chart;
+        ctx.save();
+        ctx.font = "bold 28px Segoe UI";
+        ctx.fillStyle = sugarColor;
+        ctx.textAlign = "center";
+        ctx.fillText(sugar.toFixed(1) + "%", width / 2, top + height - 10);
+        ctx.font = "14px Segoe UI";
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText("Sugar %", width / 2, top + height + 20);
+        ctx.restore();
+      }
+    }]
+  });
 
-  supplyTareChart = new Chart(
-    document.getElementById("supplyTareChart"),
-    {
-      type: "line",
-      data: { labels: ["Today"], datasets: [{ label: "Tare %", data: [tare], tension: .4, fill: true }] },
-      options: getProfessionalOptions()
-    }
-  );
+  // Tare % — Gauge
+  const tareMax   = 20;
+  const tareColor = tare <= 4 ? "#4ade80" : tare <= 8 ? "#facc15" : "#f87171";
+  supplyTareChart = new Chart(document.getElementById("supplyTareChart"), {
+    type: "doughnut",
+    data: {
+      datasets: [{
+        data: [tare, tareMax - tare],
+        backgroundColor: [tareColor, "#1f2937"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      circumference: 180,
+      rotation: -90,
+      cutout: "75%",
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    },
+    plugins: [{
+      id: "tareText",
+      beforeDraw(chart) {
+        const { ctx, chartArea: { top, width, height } } = chart;
+        ctx.save();
+        ctx.font = "bold 28px Segoe UI";
+        ctx.fillStyle = tareColor;
+        ctx.textAlign = "center";
+        ctx.fillText(tare.toFixed(1) + "%", width / 2, top + height - 10);
+        ctx.font = "14px Segoe UI";
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText("Tare %", width / 2, top + height + 20);
+        ctx.restore();
+      }
+    }]
+  });
 }
 </script>
 </body>
