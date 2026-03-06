@@ -23,7 +23,13 @@ body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
 color:var(--text);
+
 display:flex;
+justify-content:center;
+align-items:center;
+
+min-height:100vh;
+
 transition:.3s;
 
 /* space background */
