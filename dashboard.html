@@ -271,7 +271,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 // ================= BOOTSTRAP =========================
 // =====================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxeKS_KxE1FpJ4R1rNnTEbxAFMuB0s-vxMTqkXXaSN0zxQwFTedF4m7QRv0exxgtLmL/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxV_l6zvKchdHTCr49zGvRjK2zLim_SvV4v5aSVviiSGHqpKU2v1YpMioeWasI1Uf8l/exec";
 
 // Redirect to login if no user in localStorage
 const user = JSON.parse(localStorage.getItem("user"));
@@ -422,8 +422,9 @@ function loadAdminData() {
 
   fetch(API_URL, {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json"
+  mode: "cors",
+  headers:{
+    "Content-Type":"application/json"
   },
   body: JSON.stringify({
     action: "adminAnalytics",
@@ -536,8 +537,9 @@ function loadSupplyData() {
 
   fetch(API_URL, {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json"
+  mode: "cors",
+  headers:{
+    "Content-Type":"application/json"
   },
   body: JSON.stringify({
     action: "supplyAnalytics",
