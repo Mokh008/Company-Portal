@@ -430,3 +430,47 @@ padding:30px;
 }
 
 }
+/* ================= DASHBOARD OVERRIDE ================= */
+
+.main{
+padding:40px 60px;
+}
+
+.kpi-card,
+.chart-card,
+.project-card{
+
+transition:.35s ease;
+}
+
+.project-card:hover{
+transform:translateY(-10px) scale(1.04);
+box-shadow:0 25px 70px rgba(45,212,191,.35);
+}
+
+.kpi-card:hover{
+transform:translateY(-4px);
+box-shadow:0 12px 35px rgba(0,0,0,.5);
+}
+
+/* responsive fix */
+
+@media (max-width:900px){
+
+.sidebar{
+display:none;
+}
+
+.main{
+padding:20px;
+}
+
+.projects{
+grid-template-columns:1fr;
+}
+
+.charts{
+grid-template-columns:1fr;
+}
+
+}
