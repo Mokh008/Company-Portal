@@ -68,7 +68,7 @@ button{
   cursor:pointer;
 }
 button:hover{border-color:var(--accent);}
-select{
+select,input[type="date"]{
   width:100%;
   padding:6px;
   border-radius:8px;
@@ -187,7 +187,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
   <!-- Projects shortcuts -->
   <div id="projectsSection" class="projects"></div>
 
-  <!-- KPI cards (Rent / Expenses / Operating Cost / Custody[admin only]) -->
+  <!-- KPI cards -->
   <div id="kpiSection" class="kpis"></div>
 
   <!-- ===== ADMIN CHARTS ===== -->
@@ -218,8 +218,7 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
              id="supplyDateFilter"
              onchange="loadSupplyData()"
              onkeydown="return false"
-             onpaste="return false"
-             style="width:100%;padding:6px;border-radius:8px;background:var(--card);color:var(--text);border:1px solid var(--border);">
+             onpaste="return false">
     </div>
 
     <!-- Sector filter: Admin only -->
@@ -271,22 +270,20 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 // ================= BOOTSTRAP =========================
 // =====================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxsMTZgi7NiUDI6ZxtVjL8IETD_qA5YBnTMe3wSi7a1T08KPYRaeS2hwAmadqsIkCl3/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwKFQNj6izqkZm93EMt1NTPMhCsAyfcctyuiv6okLORMEv2SmXApo64zronsl31ZLEa/exec";
 
-// Redirect to login if no user in localStorage
 const user = JSON.parse(localStorage.getItem("user"));
 if (!user) window.location.href = "index.html";
 
 // =====================================================
-// ================= ROLE HELPERS ======================
+// ================= ROLE FLAGS ========================
 // =====================================================
 
-const role = String(user.role || "").toLowerCase();
-
-const isAdmin        = role === "admin";
-const isSectorMgr    = role === "sector_manager";
-const isManager      = role === "manager";
-const isEngineer     = role === "engineer";
+const role        = String(user.role || "").toLowerCase();
+const isAdmin     = role === "admin";
+const isSectorMgr = role === "sector_manager";
+const isManager   = role === "manager";
+const isEngineer  = role === "engineer";
 
 // =====================================================
 // ================= CHART INSTANCES ===================
@@ -299,15 +296,26 @@ let supplySugarChart   = null;
 let supplyTareChart    = null;
 
 // =====================================================
+// ================= IN-FLIGHT REQUEST CONTROL =========
+// =====================================================
+
+// Prevents stale responses from overwriting newer ones
+let _adminReqId  = 0;
+let _supplyReqId = 0;
+
+// =====================================================
 // ================= UI HELPERS ========================
 // =====================================================
 
 function currency(n) { return new Intl.NumberFormat().format(n || 0); }
-function showLoader() { document.getElementById("loaderOverlay").style.display = "flex"; }
-function hideLoader() { document.getElementById("loaderOverlay").style.display = "none"; }
+
+let _loaderCount = 0;
+function showLoader() { _loaderCount++; document.getElementById("loaderOverlay").style.display = "flex"; }
+function hideLoader() { _loaderCount = Math.max(0, _loaderCount - 1); if (!_loaderCount) document.getElementById("loaderOverlay").style.display = "none"; }
+
 function toggleTheme() { document.body.classList.toggle("light"); }
-function logout() { localStorage.removeItem("user"); window.location.href = "index.html"; }
-function exportPDF() { html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf"); }
+function logout()      { localStorage.removeItem("user"); window.location.href = "index.html"; }
+function exportPDF()   { html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf"); }
 
 function getProfessionalOptions() {
   return { responsive: true, maintainAspectRatio: true, aspectRatio: 2 };
@@ -319,11 +327,10 @@ function getProfessionalOptions() {
 
 window.addEventListener("DOMContentLoaded", function () {
 
-  // Show user info
   document.getElementById("userInfo").innerText =
     user.name + " • " + user.role + (user.sector ? " • " + user.sector : "");
 
-  // Show admin-only UI elements
+  // Admin-only UI
   if (isAdmin) {
     document.getElementById("adminSectorCard").style.display  = "";
     document.getElementById("supplySectorCard").style.display = "";
@@ -337,16 +344,17 @@ window.addEventListener("DOMContentLoaded", function () {
   renderProjects();
   buildAdminMonthFilter();
 
-  // Small delay to let month filter render before first call
-  setTimeout(() => loadAdminData(), 100);
+  // Run both requests in parallel on load
+  setTimeout(() => {
+    loadAdminData();
+    loadSupplyData();
+  }, 100);
 
   // Supply date default = today
   const dateInput = document.getElementById("supplyDateFilter");
   if (!dateInput.value) {
     dateInput.value = new Date().toISOString().split("T")[0];
   }
-
-  loadSupplyData();
 
   // Auto-refresh supply every 60s
   setInterval(() => loadSupplyData(), 60000);
@@ -380,10 +388,8 @@ function renderProjects() {
 function buildAdminMonthFilter() {
   const select = document.getElementById("monthFilter");
   if (!select) return;
-
   select.innerHTML = "";
 
-  // "All" option
   const allOpt = document.createElement("option");
   allOpt.value = "";
   allOpt.textContent = "All";
@@ -395,14 +401,12 @@ function buildAdminMonthFilter() {
     const d     = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const year  = d.getFullYear();
-
-    const opt = document.createElement("option");
-    opt.value = month + "-" + year;
+    const opt   = document.createElement("option");
+    opt.value   = month + "-" + year;
     opt.textContent = d.toLocaleString("default", { month: "long" }) + " " + year;
     select.appendChild(opt);
   }
 
-  // Default = current month
   select.value = String(now.getMonth() + 1).padStart(2, "0") + "-" + now.getFullYear();
 }
 
@@ -411,11 +415,11 @@ function buildAdminMonthFilter() {
 // =====================================================
 
 function loadAdminData() {
+  const reqId = ++_adminReqId;
   showLoader();
 
   const month  = document.getElementById("monthFilter")?.value || "";
-  // sector filter only sent if admin (backend ignores it for others anyway,
-  // but we keep the UI clean)
+  // Sector filter: only sent for admin; backend ignores it for others
   const sector = isAdmin
     ? (document.getElementById("adminSectorFilter")?.value || "")
     : "";
@@ -430,6 +434,8 @@ function loadAdminData() {
   })
   .then(res => res.json())
   .then(data => {
+    // Discard stale responses
+    if (reqId !== _adminReqId) return;
     if (!data || data.success === false) throw new Error(data?.error || "Admin API error");
 
     if (data.kpis)        renderKPIs(data.kpis);
@@ -438,8 +444,9 @@ function loadAdminData() {
     hideLoader();
   })
   .catch(err => {
+    if (reqId !== _adminReqId) return;
     hideLoader();
-    alert("Admin error: " + err.message);
+    console.error("Admin error:", err.message);
   });
 }
 
@@ -447,10 +454,6 @@ function loadAdminData() {
 // ================= RENDER KPIs =======================
 // =====================================================
 
-/**
- * Renders Rent / Expenses / Operating Cost cards.
- * Custody card is shown ONLY for admin, and only if kpis.custody exists.
- */
 function renderKPIs(k) {
   let html = `
     <div class="kpi-card">
@@ -467,7 +470,6 @@ function renderKPIs(k) {
     </div>
   `;
 
-  // Custody: admin only — backend only sends it for admin
   if (isAdmin && k.custody) {
     html += `
       <div class="kpi-card">
@@ -487,11 +489,9 @@ function renderKPIs(k) {
 function renderAdminCharts(data) {
   if (!data) return;
 
-  // Destroy old charts safely
   if (adminRentChart     instanceof Chart) adminRentChart.destroy();
   if (adminEmployeeChart instanceof Chart) adminEmployeeChart.destroy();
 
-  // Rent vs Expenses — visible to everyone
   adminRentChart = new Chart(
     document.getElementById("adminRentChart"),
     {
@@ -504,7 +504,6 @@ function renderAdminCharts(data) {
     }
   );
 
-  // Employee Activity — admin & sector_manager only
   if (isAdmin || isSectorMgr) {
     adminEmployeeChart = new Chart(
       document.getElementById("adminEmployeeChart"),
@@ -525,11 +524,16 @@ function renderAdminCharts(data) {
 // =====================================================
 
 function loadSupplyData() {
+  const reqId = ++_supplyReqId;
   showLoader();
 
   const dateInput = document.getElementById("supplyDateFilter");
   const date      = dateInput?.value || "";
-  const sector    = isAdmin ? (document.getElementById("sectorFilter")?.value || "") : "";
+
+  // Sector filter sent only for admin; backend enforces sector for others
+  const sector = isAdmin
+    ? (document.getElementById("sectorFilter")?.value || "")
+    : "";
 
   fetch(API_URL, {
     method: "POST",
@@ -541,9 +545,10 @@ function loadSupplyData() {
   })
   .then(res => res.json())
   .then(data => {
+    if (reqId !== _supplyReqId) return;
     if (!data || data.success === false) throw new Error(data?.error || "Supply API error");
 
-    // If backend chose a date automatically, sync it to the picker
+    // Sync date picker if backend chose a date automatically
     if (!date && data.supplySummary?.selectedDate) {
       dateInput.value = data.supplySummary.selectedDate;
     }
@@ -553,15 +558,14 @@ function loadSupplyData() {
       renderSupplyCharts(data.supplySummary);
     }
 
-    if (data.supplyTop5) {
-      renderTop5(data.supplyTop5);
-    }
+    if (data.supplyTop5) renderTop5(data.supplyTop5);
 
     hideLoader();
   })
   .catch(err => {
+    if (reqId !== _supplyReqId) return;
     hideLoader();
-    alert("Supply error: " + err.message);
+    console.error("Supply error:", err.message);
   });
 }
 
@@ -579,56 +583,23 @@ function renderSupplyKPIs(data) {
   const achToDate = toDate.totalQuota ? ((toDate.totalDelivered / toDate.totalQuota) * 100).toFixed(1) : "0.0";
 
   document.getElementById("supplyKPIs").innerHTML = `
-
-    <!-- TODAY -->
-    <div class="kpi-card">
-      <div class="kpi-title">Quota (Today)</div>
-      <div class="kpi-value">${today.totalQuota || 0}</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-title">Quota (Today)</div><div class="kpi-value">${today.totalQuota || 0}</div></div>
     <div class="kpi-card">
       <div class="kpi-title">Delivered (Today)</div>
-      <div class="kpi-value">
-        ${today.totalDelivered || 0}
-        <div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${today.totalNet || 0}</div>
-      </div>
+      <div class="kpi-value">${today.totalDelivered || 0}<div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${today.totalNet || 0}</div></div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Achievement % (Today)</div>
-      <div class="kpi-value">${achToday}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Avg Sugar (Today)</div>
-      <div class="kpi-value">${(today.avgSugar || 0).toFixed(2)}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Avg Tare (Today)</div>
-      <div class="kpi-value">${(today.avgTare || 0).toFixed(2)}%</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-title">Achievement % (Today)</div><div class="kpi-value">${achToday}%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Avg Sugar (Today)</div><div class="kpi-value">${(today.avgSugar || 0).toFixed(2)}%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Avg Tare (Today)</div><div class="kpi-value">${(today.avgTare || 0).toFixed(2)}%</div></div>
 
-    <!-- TO DATE -->
-    <div class="kpi-card">
-      <div class="kpi-title">Quota (To Date)</div>
-      <div class="kpi-value">${toDate.totalQuota || 0}</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-title">Quota (To Date)</div><div class="kpi-value">${toDate.totalQuota || 0}</div></div>
     <div class="kpi-card">
       <div class="kpi-title">Delivered (To Date)</div>
-      <div class="kpi-value">
-        ${toDate.totalDelivered || 0}
-        <div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${toDate.totalNet || 0}</div>
-      </div>
+      <div class="kpi-value">${toDate.totalDelivered || 0}<div style="font-size:13px;color:var(--muted);margin-top:6px;">Net: ${toDate.totalNet || 0}</div></div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Achievement % (To Date)</div>
-      <div class="kpi-value">${achToDate}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Avg Sugar (To Date)</div>
-      <div class="kpi-value">${(toDate.avgSugar || 0).toFixed(2)}%</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-title">Avg Tare (To Date)</div>
-      <div class="kpi-value">${(toDate.avgTare || 0).toFixed(2)}%</div>
-    </div>
+    <div class="kpi-card"><div class="kpi-title">Achievement % (To Date)</div><div class="kpi-value">${achToDate}%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Avg Sugar (To Date)</div><div class="kpi-value">${(toDate.avgSugar || 0).toFixed(2)}%</div></div>
+    <div class="kpi-card"><div class="kpi-title">Avg Tare (To Date)</div><div class="kpi-value">${(toDate.avgTare || 0).toFixed(2)}%</div></div>
   `;
 }
 
@@ -641,14 +612,11 @@ function renderTop5(data) {
 
   function buildCard(title, rows, field) {
     if (!rows || !rows.length) return "";
-
     let html = `<div class="kpi-card"><h4>${title}</h4><table>`;
-
     rows.forEach((r, i) => {
       const cls = i === 0 ? "rank1" : i === 1 ? "rank2" : i === 2 ? "rank3" : "";
       html += `<tr class="${cls}"><td>${i + 1}. ${r.engineer}</td><td>${(r[field] || 0).toFixed(2)}</td></tr>`;
     });
-
     html += "</table></div>";
     return html;
   }
@@ -660,7 +628,6 @@ function renderTop5(data) {
       ${buildCard("Top 5 Sugar (Today)", data.today.topSugar, "sugar")}
       ${buildCard("Top 5 Tare (Today)",  data.today.topTare,  "tare")}
     </div>
-
     <h3 class="section-title">Top 5 — To Date</h3>
     <div class="top5-row">
       ${buildCard("Top 5 Ton (To Date)",   data.toDate.topTons,  "tons")}
@@ -677,15 +644,15 @@ function renderTop5(data) {
 function renderSupplyCharts(summary) {
   if (!summary) return;
 
-  const today    = summary.today;
-  const quota    = today.totalQuota    || 0;
-  const delivered= today.totalDelivered|| 0;
-  const sugar    = today.avgSugar      || 0;
-  const tare     = today.avgTare       || 0;
+  const today     = summary.today;
+  const quota     = today.totalQuota     || 0;
+  const delivered = today.totalDelivered || 0;
+  const sugar     = today.avgSugar       || 0;
+  const tare      = today.avgTare        || 0;
 
-  if (supplyPlanChart)  supplyPlanChart.destroy();
-  if (supplySugarChart) supplySugarChart.destroy();
-  if (supplyTareChart)  supplyTareChart.destroy();
+  if (supplyPlanChart  instanceof Chart) supplyPlanChart.destroy();
+  if (supplySugarChart instanceof Chart) supplySugarChart.destroy();
+  if (supplyTareChart  instanceof Chart) supplyTareChart.destroy();
 
   supplyPlanChart = new Chart(
     document.getElementById("supplyPlanChart"),
@@ -706,10 +673,7 @@ function renderSupplyCharts(summary) {
     document.getElementById("supplySugarChart"),
     {
       type: "line",
-      data: {
-        labels: ["Today"],
-        datasets: [{ label: "Sugar %", data: [sugar], tension: .4, fill: true }]
-      },
+      data: { labels: ["Today"], datasets: [{ label: "Sugar %", data: [sugar], tension: .4, fill: true }] },
       options: getProfessionalOptions()
     }
   );
@@ -718,10 +682,7 @@ function renderSupplyCharts(summary) {
     document.getElementById("supplyTareChart"),
     {
       type: "line",
-      data: {
-        labels: ["Today"],
-        datasets: [{ label: "Tare %", data: [tare], tension: .4, fill: true }]
-      },
+      data: { labels: ["Today"], datasets: [{ label: "Tare %", data: [tare], tension: .4, fill: true }] },
       options: getProfessionalOptions()
     }
   );
