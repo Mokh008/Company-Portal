@@ -10,7 +10,40 @@
   --border:#1f2937;
   --danger:#f87171;
 }
+/* ===== MK NEXUS Background layers (put in style.css after :root) ===== */
 
+#mk-bg {
+  position:fixed;
+  inset:0;
+  background-image: url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1476&q=80");
+  background-size:cover;
+  background-position:center;
+  background-attachment:scroll; /* أو fixed لو حابب، لكن scroll أقل مشاكل */
+  z-index:-3; /* تحت كل حاجة */
+  pointer-events:none;
+}
+
+/* dark overlay + subtle grid on top of image */
+#mk-overlay {
+  position:fixed;
+  inset:0;
+  background: rgba(5,10,20,0.55); /* darken image */
+  background-image:
+    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+  background-size: 40px 40px, 40px 40px;
+  background-blend-mode: overlay;
+  z-index:-2;
+  pointer-events:none;
+}
+
+/* starfall should be above overlay but below content (or adjust as you like) */
+.starfall{
+  position:fixed;
+  inset:0;
+  z-index:-1; /* نجوم فوق الـ overlay لكن تحت المحتوى */
+  pointer-events:none;
+}
 /* ================================================= */
 /* ================= GLOBAL ========================= */
 /* ================================================= */
