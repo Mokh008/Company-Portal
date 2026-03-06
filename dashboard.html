@@ -353,7 +353,7 @@ window.addEventListener("DOMContentLoaded", function () {
   // Supply date default = today
   const dateInput = document.getElementById("supplyDateFilter");
   if (!dateInput.value) {
-    dateInput.value = new Date().toISOString().split("T")[0];
+    dateInput.value = "";
   }
 
   // Auto-refresh supply every 60s
