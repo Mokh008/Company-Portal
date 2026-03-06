@@ -24,18 +24,15 @@ margin:0;
 font-family:'Segoe UI',sans-serif;
 color:var(--text);
 
-/* Animated gradient background */
-background:linear-gradient(
--45deg,
-#0b0f19,
-#0e1422,
-#08111f,
-#0b0f19
-);
+/* space background */
 
-background-size:400% 400%;
-animation:gradientBG 18s ease infinite;
+background-color:#0b0f19;
 
+background-image:url("https://images.unsplash.com/photo-1536152470836-b943b246224c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1476&q=80");
+
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
 overflow-x:hidden;
 }
 
