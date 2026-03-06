@@ -23,37 +23,42 @@ body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
 color:var(--text);
+display:flex;
+transition:.3s;
 
 /* space background */
 
 background-color:#0b0f19;
 
-background-image:url("https://images.unsplash.com/photo-1536152470836-b943b246224c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1476&q=80");
+background-image:url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1476&q=80");
 
 background-size:cover;
 background-position:center;
 background-attachment:fixed;
-overflow-x:hidden;
 }
-
 /* background animation */
 @keyframes gradientBG{
 0%{background-position:0% 50%;}
 50%{background-position:100% 50%;}
 100%{background-position:0% 50%;}
 }
-
-/* subtle grid */
 body::before{
 content:"";
 position:fixed;
 inset:0;
-background-image:
+
+background:
+rgba(5,10,20,.65),
 linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
 linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-background-size:40px 40px;
+
+background-size:
+auto,
+40px 40px,
+40px 40px;
+
 pointer-events:none;
-z-index:-1;
+z-index:0;
 }
 /* ================================================= */
 /* ================= LOGIN PAGE ===================== */
