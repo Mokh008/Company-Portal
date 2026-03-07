@@ -2,17 +2,18 @@
 <html>
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MK Nexus Portal</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="login-container">
   <div class="login-box">
+<img src="images/mk-logo.png" class="login-logo startup-logo" loading="eager">
     <h2>MK Nexus Portal</h2>
     <input type="email" id="email" placeholder="Email" autocomplete="username">
     <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-    <button id="loginBtn" onclick="login()">Login</button>
-  </div>
+<button id="loginBtn" type="button" onclick="login()">Login</button>  </div>
 </div>
 
 <!-- ===== LOADER ===== -->
@@ -23,7 +24,7 @@
 <!-- ===== WELCOME SCREEN ===== -->
 <div id="welcomeScreen" class="welcome-overlay">
   <div class="welcome-content">
-    <img src="assets/icons/mk-nexus.png" class="welcome-logo">
+    <img src="images/mk-logo.png" class="welcome-logo">
     <h1>Welcome to MK Nexus</h1>
     <p id="welcomeUser"></p>
   </div>
@@ -136,11 +137,24 @@ function showWelcomeScreen(name){
   screen.style.display = "flex";
 
   setTimeout(()=>{
-    window.location.href = "dashboard.html";
-  },1500);
+  window.location.href = "dashboard.html";
+},1800);
 }
 
 </script>
+<script>
 
+window.addEventListener("load",()=>{
+
+document.body.style.opacity="0";
+
+setTimeout(()=>{
+document.body.style.transition="opacity .6s";
+document.body.style.opacity="1";
+},100);
+
+});
+
+</script>
 </body>
 </html>
