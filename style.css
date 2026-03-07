@@ -1,950 +1,1049 @@
-:root{
-  --bg:#0b0f19;
-  --bg2:#0e1422;
-  --card:#121826;
-  --accent:#2dd4bf;
-  --accent2:#0ea5e9;
-  --accent-glow:rgba(45,212,191,.35);
-  --text:#f1f5f9;
-  --muted:#94a3b8;
-  --border:#1f2937;
-  --danger:#f87171;
+/* ============================================
+   MK NEXUS ENTERPRISE — style.css
+   Responsive · Professional · Fluid
+   ============================================ */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+  /* Colors */
+  --bg:        #080d18;
+  --bg2:       #0c1220;
+  --card:      rgba(15, 22, 40, 0.85);
+  --card-solid: #0f1628;
+  --accent:    #2dd4bf;
+  --accent2:   #0ea5e9;
+  --accent3:   #818cf8;
+  --danger:    #f87171;
+  --warning:   #facc15;
+  --success:   #4ade80;
+  --text:      #f1f5f9;
+  --muted:     #64748b;
+  --border:    rgba(255,255,255,0.07);
+  --border-accent: rgba(45,212,191,0.25);
+
+  /* Glow effects */
+  --glow-accent: 0 0 25px rgba(45,212,191,0.18);
+  --glow-hover:  0 0 40px rgba(45,212,191,0.32);
+
+  /* Shadows */
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.3);
+  --shadow-md:  0 8px 30px rgba(0,0,0,0.4);
+  --shadow-lg:  0 20px 60px rgba(0,0,0,0.5);
+
+  /* Typography */
+  --font-display: 'Rajdhani', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Spacing — fluid using clamp */
+  --space-xs:  clamp(6px,  0.5vw,  10px);
+  --space-sm:  clamp(10px, 1vw,    16px);
+  --space-md:  clamp(16px, 2vw,    28px);
+  --space-lg:  clamp(24px, 3vw,    48px);
+  --space-xl:  clamp(36px, 5vw,    80px);
+
+  /* Border radius */
+  --radius-sm:  10px;
+  --radius-md:  16px;
+  --radius-lg:  24px;
+  --radius-xl:  32px;
+
+  /* Sidebar width */
+  --sidebar-w: 240px;
+
+  /* Max content width (prevents stretching on 4K) */
+  --max-content: 1600px;
 }
 
-/* ===== MK NEXUS Background layers ===== */
-
-#mk-bg{
-position:fixed;
-inset:0;
-
-background-image:url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1476&q=80");
-
-background-size:cover;
-background-position:center;
-
-z-index:-3;
-pointer-events:none;
+/* ── Light Mode Overrides ── */
+.light {
+  --bg:        #f0f4f8;
+  --bg2:       #e8edf4;
+  --card:      rgba(255,255,255,0.9);
+  --card-solid: #ffffff;
+  --accent:    #0ea5e9;
+  --text:      #0f172a;
+  --muted:     #64748b;
+  --border:    rgba(0,0,0,0.08);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 30px rgba(0,0,0,0.12);
 }
 
-#mk-overlay{
-position:fixed;
-inset:0;
-
-background:
-rgba(5,10,20,.6),
-linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-
-background-size:
-auto,
-40px 40px,
-40px 40px;
-
-z-index:-2;
-pointer-events:none;
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.starfall{
-position:fixed;
-inset:0;
-z-index:-1;
-pointer-events:none;
+html {
+  scroll-behavior: smooth;
 }
-/* ===== MK NEXUS Background layers (put in style.css after :root) ===== */
+
+body {
+  font-family: var(--font-body);
+  font-size: clamp(13px, 1.1vw, 15px);
+  color: var(--text);
+  background-color: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  transition: color 0.3s, background-color 0.3s;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   BACKGROUND LAYERS
+   ============================================ */
 
 #mk-bg {
-  position:fixed;
-  inset:0;
-  background-image: url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1476&q=80");
-  background-size:cover;
-  background-position:center;
-  background-attachment:scroll; /* أو fixed لو حابب، لكن scroll أقل مشاكل */
-  z-index:-3; /* تحت كل حاجة */
-  pointer-events:none;
+  position: fixed;
+  inset: 0;
+  background-image: url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1920&q=80");
+  background-size: cover;
+  background-position: center;
+  z-index: -3;
+  pointer-events: none;
+  transition: opacity 0.4s;
 }
 
-/* dark overlay + subtle grid on top of image */
+.light #mk-bg {
+  opacity: 0.04;
+}
+
 #mk-overlay {
-  position:fixed;
-  inset:0;
-  background: rgba(5,10,20,0.55); /* darken image */
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-  background-size: 40px 40px, 40px 40px;
-  background-blend-mode: overlay;
-  z-index:-2;
-  pointer-events:none;
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(8,13,24,0.82) 0%, rgba(8,13,24,0.65) 100%),
+    linear-gradient(rgba(45,212,191,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45,212,191,0.015) 1px, transparent 1px);
+  background-size: auto, 60px 60px, 60px 60px;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.light #mk-overlay {
+  background: rgba(240,244,248,0.6);
+}
+
+/* ============================================
+   STARFALL
+   ============================================ */
+
+.starfall {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.falling-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent), 0 0 14px rgba(45,212,191,0.5);
+  opacity: 0;
+  animation: starFall linear infinite;
+}
+
+@keyframes starFall {
+  0%   { transform: translateY(-20px) translateX(0); opacity: 0; }
+  8%   { opacity: 0.8; }
+  92%  { opacity: 0.6; }
+  100% { transform: translateY(105vh) translateX(60px); opacity: 0; }
+}
+
+/* nth-child positions & timings */
+.falling-star:nth-child(1)  { left: 3vw;  animation-duration: 8s;  animation-delay: 0s;   }
+.falling-star:nth-child(2)  { left: 8vw;  animation-duration: 11s; animation-delay: 2.5s; }
+.falling-star:nth-child(3)  { left: 14vw; animation-duration: 7s;  animation-delay: 5s;   }
+.falling-star:nth-child(4)  { left: 20vw; animation-duration: 9s;  animation-delay: 1.5s; }
+.falling-star:nth-child(5)  { left: 27vw; animation-duration: 8s;  animation-delay: 4s;   }
+.falling-star:nth-child(6)  { left: 34vw; animation-duration: 12s; animation-delay: 6.5s; }
+.falling-star:nth-child(7)  { left: 42vw; animation-duration: 8s;  animation-delay: 2s;   }
+.falling-star:nth-child(8)  { left: 50vw; animation-duration: 9s;  animation-delay: 3.5s; }
+.falling-star:nth-child(9)  { left: 58vw; animation-duration: 7s;  animation-delay: 0.5s; }
+.falling-star:nth-child(10) { left: 65vw; animation-duration: 10s; animation-delay: 7s;   }
+.falling-star:nth-child(11) { left: 72vw; animation-duration: 8s;  animation-delay: 4.5s; }
+.falling-star:nth-child(12) { left: 79vw; animation-duration: 9s;  animation-delay: 6s;   }
+.falling-star:nth-child(13) { left: 86vw; animation-duration: 8s;  animation-delay: 3s;   }
+.falling-star:nth-child(14) { left: 93vw; animation-duration: 11s; animation-delay: 5.5s; }
+.falling-star:nth-child(15) { left: 11vw; animation-duration: 10s; animation-delay: 8s;   }
+.falling-star:nth-child(16) { left: 22vw; animation-duration: 9s;  animation-delay: 7.5s; }
+.falling-star:nth-child(17) { left: 45vw; animation-duration: 8s;  animation-delay: 9s;   }
+.falling-star:nth-child(18) { left: 63vw; animation-duration: 10s; animation-delay: 8.5s; }
+.falling-star:nth-child(19) { left: 76vw; animation-duration: 7s;  animation-delay: 2.2s; }
+.falling-star:nth-child(20) { left: 96vw; animation-duration: 11s; animation-delay: 10s;  }
+
+.light .falling-star {
+  opacity: 0;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+  padding: var(--space-lg) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+  z-index: 100;
+  transition: transform 0.3s ease, width 0.3s ease;
+}
+
+/* MK NEXUS Text Logo */
+.mk-logo {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(45,212,191,0.3));
+  animation: logoGlow 4s ease-in-out infinite;
+  line-height: 1.1;
+}
+
+/* Inline SVG logo in sidebar */
+.sidebar-logo-svg {
+  width: clamp(50px, 5vw, 70px);
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(45,212,191,0.4));
+  transition: filter 0.3s, transform 0.3s;
+  animation: logoBreath 4s ease-in-out infinite;
+}
+
+.sidebar-logo-svg:hover {
+  filter: drop-shadow(0 0 24px rgba(45,212,191,0.65));
+  transform: scale(1.06);
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(45,212,191,0.2)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(45,212,191,0.55)); }
+}
+
+@keyframes logoBreath {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.05); }
+}
+
+/* Sidebar divider */
+.sidebar-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+
+.main {
+  flex: 1;
+  padding: var(--space-lg) var(--space-xl);
+  max-width: calc(var(--max-content) - var(--sidebar-w));
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+#userInfo {
+  font-family: var(--font-body);
+  font-size: clamp(13px, 1vw, 15px);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#userInfo strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── HEADER CONTROLS ── */
+.controls {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   BUTTONS — Global Override for Dashboard
+   ============================================ */
+
+button {
+  font-family: var(--font-body);
+  font-size: clamp(11px, 0.9vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  /* RESET width for dashboard buttons (only login has 100%) */
+  width: auto;
+  margin-top: 0;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(45,212,191,0.08) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+button:hover::after {
+  transform: translateX(100%);
+}
+
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--glow-accent);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Login Page Button (full width) ── */
+.login-box button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  color: #fff;
+}
+
+.login-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(45,212,191,0.4);
+  color: #fff;
+}
+
+/* ============================================
+   INPUTS & SELECTS
+   ============================================ */
+
+input, select {
+  font-family: var(--font-body);
+  font-size: clamp(12px, 0.9vw, 14px);
+  width: 100%;
+  padding: 9px 13px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(8,13,24,0.6);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+  backdrop-filter: blur(8px);
+}
+
+input::placeholder {
+  color: var(--muted);
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(45,212,191,0.12);
+  background: rgba(12,18,32,0.8);
+}
+
+select option {
+  background: var(--card-solid);
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  cursor: pointer;
+}
+
+/* ============================================
+   KPI FILTER ROW
+   ============================================ */
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+/* ── KPI Card ── */
+.kpi-card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: clamp(16px, 2vw, 24px);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle top-accent line on each card */
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.kpi-card:hover::before {
+  opacity: 1;
+}
+
+.kpi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md), var(--glow-accent);
+  border-color: var(--border-accent);
+}
+
+.kpi-title {
+  font-family: var(--font-body);
+  font-size: clamp(11px, 0.85vw, 13px);
+  font-weight: 500;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.5vw, 32px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+  background: linear-gradient(135deg, var(--text) 60%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   PROJECT CARDS
+   ============================================ */
+
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.project-card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: clamp(28px, 3vw, 44px) clamp(20px, 2vw, 32px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Radial glow on hover */
+.project-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 0%, rgba(45,212,191,0.12), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.project-card:hover::after {
+  opacity: 1;
+}
+
+.project-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: var(--accent);
+  box-shadow: 0 30px 70px rgba(45,212,191,0.25), var(--shadow-lg);
+}
+
+.project-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.6vw, 22px);
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text);
+  transition: color 0.3s;
+  position: relative;
+  z-index: 1;
+}
+
+.project-card:hover h3 {
+  color: var(--accent);
+}
+
+/* ============================================
+   SECTION TITLES
+   ============================================ */
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 1.8vw, 24px);
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text);
+  margin: var(--space-xl) 0 var(--space-md);
+  padding-left: 14px;
+  border-left: 3px solid var(--accent);
+  position: relative;
+}
+
+/* ============================================
+   CHARTS GRID — RESPONSIVE
+   ============================================ */
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+/* ── Chart Card ── */
+.chart-card {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: clamp(18px, 2vw, 28px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(45,212,191,0.4), transparent);
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), var(--glow-accent);
+  border-color: var(--border-accent);
+}
+
+.chart-card h3 {
+  font-family: var(--font-display);
+  font-size: clamp(14px, 1.2vw, 18px);
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Chart canvas wrapper — key for responsive sizing */
+.chart-card canvas {
+  width: 100% !important;
+  /* height is controlled by Chart.js aspectRatio */
+}
+
+/* Gauge charts (doughnut) need a fixed container */
+.chart-card.gauge {
+  min-height: clamp(220px, 25vw, 320px);
+}
+
+/* ============================================
+   TOP 5 TABLES
+   ============================================ */
+
+.top5-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 7px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: clamp(11px, 0.85vw, 13px);
+  font-family: var(--font-body);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px;
+}
+
+tr:last-child td { border-bottom: none; }
+
+tr:hover td {
+  background: rgba(45,212,191,0.04);
+}
+
+.rank1 { color: #facc15; font-weight: 600; }
+.rank2 { color: #cbd5e1; }
+.rank3 { color: var(--danger); }
+
+/* ============================================
+   LOADER OVERLAY
+   ============================================ */
+
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.spinner {
+  width: clamp(50px, 5vw, 70px);
+  height: clamp(50px, 5vw, 70px);
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  position: relative;
+}
+
+/* Double ring effect */
+.spinner::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 4px solid transparent;
+  border-top: 4px solid var(--accent2);
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite reverse;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   LOGIN PAGE
+   ============================================ */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+}
+
+.login-box {
+  width: min(380px, 90vw);
+  padding: clamp(32px, 4vw, 52px);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: rgba(15, 22, 40, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+  text-align: center;
+  animation: loginAppear 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+@keyframes loginAppear {
+  from { opacity: 0; transform: translateY(40px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* Login title */
+.login-box h2 {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Login inputs */
+.login-box input {
+  padding: 14px 16px;
+  margin: 8px 0;
+  font-size: 14px;
+  background: rgba(8,13,24,0.6);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.login-box input:focus {
+  background: rgba(12,18,32,0.85);
 }
-
-/* starfall should be above overlay but below content (or adjust as you like) */
-.starfall{
-  position:fixed;
-  inset:0;
-  z-index:-1; /* نجوم فوق الـ overlay لكن تحت المحتوى */
-  pointer-events:none;
-}
-/* ================================================= */
-/* ================= GLOBAL ========================= */
-/* ================================================= */
-
-*{
-box-sizing:border-box;
-}
-
-body{
-margin:0;
-font-family:'Segoe UI',sans-serif;
-color:var(--text);
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-min-height:100vh;
-
-transition:.3s;
-
-/* space background */
-
-background-color:#0b0f19;
-
-background-image:url("https://images.unsplash.com/photo-1536152470836-b943b246224c?auto=format&fit=crop&w=1476&q=80");
-
-background-size:cover;
-background-position:center;
-background-attachment:fixed;
-}
-/* background animation */
-@keyframes gradientBG{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-}
-body::before{
-content:"";
-position:fixed;
-inset:0;
-
-background:
-rgba(5,10,20,.65),
-linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-
-background-size:
-auto,
-40px 40px,
-40px 40px;
-
-pointer-events:none;
-z-index:0;
-}
-/* ================================================= */
-/* ================= LOGIN PAGE ===================== */
-/* ================================================= */
-
-.login-container{
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-position:relative;
-z-index:1;
-}
-
-.login-box{
-
-backdrop-filter:blur(14px);
-background:rgba(18,24,38,.65);
-
-padding:50px;
-border-radius:22px;
-
-width:360px;
-
-border:1px solid rgba(255,255,255,.06);
-
-box-shadow:
-0 25px 80px rgba(0,0,0,.8),
-inset 0 1px 0 rgba(255,255,255,.05);
-
-text-align:center;
-
-animation:loginFloat .8s ease;
-}
-
-@keyframes loginFloat{
-from{
-transform:translateY(40px);
-opacity:0;
-}
-to{
-transform:translateY(0);
-opacity:1;
-}
-}
-
-/* login title */
-
-.login-box h2{
-margin-bottom:25px;
-font-weight:600;
-letter-spacing:2px;
-
-background:linear-gradient(90deg,var(--accent),var(--accent2));
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-}
-
-/* ================================================= */
-/* ================= INPUT ========================== */
-/* ================================================= */
-
-input{
-width:100%;
-padding:14px;
-
-margin:12px 0;
-
-border-radius:10px;
-
-border:1px solid var(--border);
-
-background:#0f1524;
-
-color:var(--text);
-
-font-size:14px;
-
-outline:none;
-
-transition:.3s;
-}
-
-input::placeholder{
-color:#64748b;
-}
-
-input:focus{
-
-border:1px solid var(--accent);
-
-box-shadow:0 0 0 3px rgba(45,212,191,.15);
-
-background:#101827;
-}
-
-/* ================================================= */
-/* ================= BUTTON ========================= */
-/* ================================================= */
-
-button{
-
-position:relative;
-
-width:100%;
-
-padding:14px;
-
-margin-top:15px;
-
-border:none;
-
-border-radius:12px;
-
-font-weight:600;
-
-letter-spacing:1px;
-
-cursor:pointer;
-
-color:white;
-
-background:linear-gradient(
-135deg,
-var(--accent),
-var(--accent2)
-);
-
-transition:.3s;
-
-overflow:hidden;
-}
-
-button::before{
-
-content:"";
-
-position:absolute;
-
-inset:0;
-
-background:linear-gradient(
-120deg,
-transparent,
-rgba(255,255,255,.3),
-transparent
-);
-
-transform:translateX(-100%);
-transition:.6s;
-}
-
-button:hover::before{
-transform:translateX(100%);
-}
-
-button:hover{
-
-transform:translateY(-2px);
-
-box-shadow:0 15px 40px var(--accent-glow);
-}
-
-button:active{
-transform:scale(.97);
-}
-
-/* ================================================= */
-/* ================= LOADER ========================= */
-/* ================================================= */
-
-.loader-overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:2000;
-}
-
-.spinner{
-
-width:60px;
-height:60px;
-
-border:5px solid rgba(255,255,255,.2);
-
-border-top:5px solid var(--accent);
-
-border-radius:50%;
-
-animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-to{transform:rotate(360deg);}
-}
-
-/* ================================================= */
-/* ================= WELCOME SCREEN ================= */
-/* ================================================= */
-
-.welcome-overlay{
-position:fixed;
-inset:0;
-
-background:
-radial-gradient(circle at center, rgba(45,212,191,.08), transparent 60%),
-linear-gradient(135deg,var(--bg),var(--bg2));
-
-display:none;
-
-justify-content:center;
-align-items:center;
-
-flex-direction:column;
-
-z-index:3000;
-
-animation:fadeIn .6s ease forwards;
-}
-
-.welcome-content{
-text-align:center;
-animation:scaleIn .8s ease forwards;
-}
-
-.welcome-logo{
-
-width:130px;
-
-margin-bottom:25px;
-
-filter:drop-shadow(0 0 25px rgba(45,212,191,.5));
-
-animation:breath 3s ease-in-out infinite;
-}
-
-@keyframes breath{
-0%,100%{transform:scale(1);}
-50%{transform:scale(1.05);}
-}
-
-.welcome-overlay h1{
-margin:0;
-font-size:32px;
-letter-spacing:2px;
-}
-
-.welcome-overlay p{
-margin-top:10px;
-color:var(--muted);
-}
-
-/* ================================================= */
-/* ================= CARDS ========================== */
-/* ================================================= */
-
-.kpi-card,
-.top5-card,
-.chart-card{
-
-background:var(--card);
-
-border-radius:18px;
-
-border:1px solid var(--border);
-
-transition:.35s;
-}
-
-.kpi-card:hover,
-.chart-card:hover{
-
-transform:translateY(-4px);
-
-box-shadow:0 15px 35px rgba(0,0,0,.5);
-}
-
-/* ================================================= */
-/* ================= TOP 5 ========================== */
-/* ================================================= */
-
-.top5-section{
-margin-top:40px;
-}
-
-.top5-row{
-
-display:grid;
-
-grid-template-columns:repeat(3,1fr);
-
-gap:25px;
-
-margin-bottom:40px;
-}
-
-.top5-card{
-padding:20px;
-}
-
-.top5-card h3{
-margin-bottom:15px;
-font-size:16px;
-}
-
-/* ================================================= */
-/* ================= CHART ========================== */
-/* ================================================= */
-
-.chart-card{
-
-padding:25px;
-
-height:380px;
-
-display:flex;
-
-flex-direction:column;
-}
-
-.chart-card canvas{
-flex:1;
-}
-
-/* ================================================= */
-/* ================= RESPONSIVE ===================== */
-/* ================================================= */
-
-@media (max-width:1200px){
-
-.top5-row{
-grid-template-columns:1fr 1fr;
-}
-
-.chart-card{
-height:340px;
-}
-
-}
-
-@media (max-width:900px){
-
-.top5-row{
-grid-template-columns:1fr;
-}
-
-.login-box{
-width:90%;
-padding:40px;
-}
-
-.chart-card{
-height:300px;
-}
-
-}
-
-@media (max-width:600px){
-
-.chart-card{
-height:280px;
-}
-
-.login-box{
-width:92%;
-padding:30px;
-}
-
-}
-/* ================================================= */
-/* =============== MK NEXUS STARFALL =============== */
-/* ================================================= */
-
-/* Star container */
-
-.starfall{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-pointer-events:none;
-z-index:-1;
-overflow:hidden;
-}
-
-/* Star style */
-
-.starfall .falling-star{
-
-position:absolute;
-
-width:4px;
-height:4px;
-
-background:#2dd4bf;
-
-border-radius:50%;
-
-box-shadow:
-0 0 6px #2dd4bf,
-0 0 12px #2dd4bf,
-0 0 20px rgba(45,212,191,.6);
-
-opacity:.7;
-
-animation:starFall linear infinite;
-}
-
-/* Animation */
-
-@keyframes starFall{
-
-0%{
-transform:translateY(-10px) translateX(0);
-opacity:0;
-}
-
-10%{
-opacity:1;
-}
-
-90%{
-opacity:1;
-}
-
-100%{
-transform:translateY(110vh) translateX(80px);
-opacity:0;
-}
-
-}
-
-/* Random positions */
-
-.starfall .falling-star:nth-child(1){
-left:5vw;
-animation-duration:7s;
-animation-delay:1s;
-}
-
-.starfall .falling-star:nth-child(2){
-left:12vw;
-animation-duration:9s;
-animation-delay:3s;
-}
-
-.starfall .falling-star:nth-child(3){
-left:18vw;
-animation-duration:6s;
-animation-delay:5s;
-}
-
-.starfall .falling-star:nth-child(4){
-left:25vw;
-animation-duration:8s;
-animation-delay:2s;
-}
-
-.starfall .falling-star:nth-child(5){
-left:32vw;
-animation-duration:7s;
-animation-delay:4s;
-}
-
-.starfall .falling-star:nth-child(6){
-left:40vw;
-animation-duration:10s;
-animation-delay:6s;
-}
-
-.starfall .falling-star:nth-child(7){
-left:48vw;
-animation-duration:7s;
-animation-delay:2s;
-}
-
-.starfall .falling-star:nth-child(8){
-left:55vw;
-animation-duration:8s;
-animation-delay:4s;
-}
-
-.starfall .falling-star:nth-child(9){
-left:62vw;
-animation-duration:6s;
-animation-delay:1s;
-}
-
-.starfall .falling-star:nth-child(10){
-left:70vw;
-animation-duration:9s;
-animation-delay:3s;
-}
-
-.starfall .falling-star:nth-child(11){
-left:78vw;
-animation-duration:7s;
-animation-delay:5s;
-}
-
-.starfall .falling-star:nth-child(12){
-left:85vw;
-animation-duration:8s;
-animation-delay:6s;
-}
-
-.starfall .falling-star:nth-child(13){
-left:92vw;
-animation-duration:7s;
-animation-delay:4s;
-}
-
-.starfall .falling-star:nth-child(14){
-left:15vw;
-animation-duration:10s;
-animation-delay:7s;
-}
-
-.starfall .falling-star:nth-child(15){
-left:30vw;
-animation-duration:9s;
-animation-delay:6s;
-}
-
-.starfall .falling-star:nth-child(16){
-left:45vw;
-animation-duration:7s;
-animation-delay:8s;
-}
-
-.starfall .falling-star:nth-child(17){
-left:60vw;
-animation-duration:9s;
-animation-delay:5s;
-}
-
-.starfall .falling-star:nth-child(18){
-left:75vw;
-animation-duration:8s;
-animation-delay:7s;
-}
-
-.starfall .falling-star:nth-child(19){
-left:88vw;
-animation-duration:6s;
-animation-delay:3s;
-}
-
-.starfall .falling-star:nth-child(20){
-left:96vw;
-animation-duration:10s;
-animation-delay:9s;
-}
-
-/* Mobile optimization */
-
-@media(max-width:768px){
-
-.starfall .falling-star{
-width:3px;
-height:3px;
-box-shadow:
-0 0 4px #2dd4bf,
-0 0 10px rgba(45,212,191,.6);
-}
-
-}
-/* ================= DASHBOARD OVERRIDE ================= */
-
-.main{
-padding:40px 60px;
-}
-
-.kpi-card,
-.chart-card,
-.project-card{
-
-transition:.35s ease;
-}
-
-.project-card:hover{
-transform:translateY(-10px) scale(1.04);
-box-shadow:0 25px 70px rgba(45,212,191,.35);
-}
-
-.kpi-card:hover{
-transform:translateY(-4px);
-box-shadow:0 12px 35px rgba(0,0,0,.5);
-}
-
-/* responsive fix */
-
-@media (max-width:900px){
-
-.sidebar{
-display:none;
-}
-
-.main{
-padding:20px;
-}
-
-.projects{
-grid-template-columns:1fr;
-}
-
-.charts{
-grid-template-columns:1fr;
-}
-
-}
-/* ================================================= */
-/* ================= MK NEXUS LOGO ================== */
-/* ================================================= */
 
 /* Login logo */
-
-.login-logo{
-
-width:90px;
-margin-bottom:20px;
-
-filter:drop-shadow(0 0 15px rgba(45,212,191,.45));
-
-transition:.4s;
+.login-logo {
+  width: clamp(70px, 8vw, 100px);
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 18px rgba(45,212,191,0.45));
+  transition: filter 0.4s, transform 0.4s;
 }
 
-.login-logo:hover{
-transform:scale(1.05);
-filter:drop-shadow(0 0 25px rgba(45,212,191,.65));
+.login-logo:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 28px rgba(45,212,191,0.65));
 }
 
-/* Dashboard logo */
-
-.dashboard-logo{
-
-height:36px;
-
-display:flex;
-align-items:center;
-gap:10px;
-
-font-weight:600;
-letter-spacing:1px;
-
-color:var(--text);
-
+/* ── MK NEXUS Logo (SVG inline or img) ── */
+.mk-logo {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+  background: linear-gradient(135deg, #2dd4bf 0%, #0ea5e9 60%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+  animation: logoGlow 4s ease-in-out infinite;
 }
 
-.dashboard-logo img{
+/* ============================================
+   WELCOME SCREEN — REDESIGNED
+   ============================================ */
 
-height:28px;
-
-filter:drop-shadow(0 0 8px rgba(45,212,191,.35));
-
-transition:.3s;
+.welcome-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 3000;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, rgba(13,20,40,0.97) 0%, rgba(5,10,20,0.99) 100%);
 }
 
-.dashboard-logo img:hover{
-
-transform:scale(1.08);
-filter:drop-shadow(0 0 18px rgba(45,212,191,.55));
-
+/* Animated rings behind welcome content */
+.welcome-overlay::before,
+.welcome-overlay::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(45,212,191,0.12);
+  animation: ringPulse 4s ease-in-out infinite;
 }
 
-/* Welcome logo */
-
-.welcome-logo{
-
-width:120px;
-
-margin-bottom:25px;
-
-filter:
-drop-shadow(0 0 25px rgba(45,212,191,.45))
-drop-shadow(0 0 40px rgba(14,165,233,.25));
-
-animation:logoBreath 3s ease-in-out infinite;
+.welcome-overlay::before {
+  width: 500px;
+  height: 500px;
+  animation-delay: 0s;
 }
 
-@keyframes logoBreath{
-
-0%{
-transform:scale(1);
+.welcome-overlay::after {
+  width: 700px;
+  height: 700px;
+  animation-delay: 1s;
+  border-color: rgba(14,165,233,0.08);
 }
 
-50%{
-transform:scale(1.08);
+@keyframes ringPulse {
+  0%, 100% { transform: scale(0.95); opacity: 0.5; }
+  50%       { transform: scale(1.05); opacity: 1;   }
 }
 
-100%{
-transform:scale(1);
+.welcome-content {
+  text-align: center;
+  z-index: 1;
+  animation: welcomeReveal 0.8s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
-}
-/* ================================================= */
-/* ============= MK NEXUS STARTUP LOGO ============== */
-/* ================================================= */
-
-.startup-logo{
-
-opacity:0;
-transform:translateY(20px) scale(.95);
-
-animation:logoStartup 1.2s ease forwards,
-logoGlow 3s ease-in-out infinite 1.2s;
-
+@keyframes welcomeReveal {
+  from { opacity: 0; transform: scale(0.8) translateY(30px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0);    }
 }
 
-@keyframes logoStartup{
-
-0%{
-opacity:0;
-transform:translateY(30px) scale(.9);
+.welcome-logo {
+  width: clamp(90px, 12vw, 140px);
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 30px rgba(45,212,191,0.5)) drop-shadow(0 0 60px rgba(14,165,233,0.2));
+  animation: welcomeLogoFloat 3s ease-in-out infinite;
 }
 
-60%{
-opacity:1;
-transform:translateY(-4px) scale(1.02);
+@keyframes welcomeLogoFloat {
+  0%, 100% { transform: translateY(0);   }
+  50%       { transform: translateY(-8px); }
 }
 
-100%{
-opacity:1;
-transform:translateY(0) scale(1);
+.welcome-overlay h1 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  margin: 0 0 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+.welcome-overlay p {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.3vw, 17px);
+  color: var(--muted);
+  letter-spacing: 1px;
 }
 
-@keyframes logoGlow{
-
-0%{
-filter:drop-shadow(0 0 8px rgba(45,212,191,.25));
+/* Welcome progress bar */
+.welcome-progress {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(200px, 60vw);
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
 }
 
-50%{
-filter:drop-shadow(0 0 20px rgba(45,212,191,.55));
+.welcome-progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  animation: progressFill 1.7s linear forwards;
+  transform-origin: left;
 }
 
-100%{
-filter:drop-shadow(0 0 8px rgba(45,212,191,.25));
+@keyframes progressFill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 
-}
-/* ================= DASHBOARD LOGO ================= */
+/* ============================================
+   DASHBOARD LOGO (sidebar)
+   ============================================ */
 
-.dashboard-logo{
-display:flex;
-align-items:center;
-gap:10px;
-font-weight:600;
-letter-spacing:1px;
-}
-
-.dashboard-logo img{
-height:28px;
-filter:drop-shadow(0 0 10px rgba(45,212,191,.4));
-transition:.3s;
+.dashboard-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-size: clamp(14px, 1.2vw, 18px);
+  color: var(--text);
 }
 
-.dashboard-logo img:hover{
-transform:scale(1.08);
-filter:drop-shadow(0 0 20px rgba(45,212,191,.6));
-}
-/* MK NEXUS TEXT LOGO */
-
-.mk-logo{
-
-font-size:28px;
-font-weight:700;
-
-letter-spacing:3px;
-
-margin-bottom:20px;
-
-background:linear-gradient(
-90deg,
-#2dd4bf,
-#0ea5e9
-);
-
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
-
-text-align:center;
-
-filter:drop-shadow(0 0 10px rgba(45,212,191,.35));
-
-animation:logoGlow 3s ease-in-out infinite;
-
+.dashboard-logo img {
+  height: clamp(24px, 2.5vw, 34px);
+  filter: drop-shadow(0 0 10px rgba(45,212,191,0.4));
+  transition: filter 0.3s, transform 0.3s;
 }
 
-@keyframes logoGlow{
-
-0%{
-filter:drop-shadow(0 0 6px rgba(45,212,191,.25));
+.dashboard-logo img:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 20px rgba(45,212,191,0.65));
 }
 
-50%{
-filter:drop-shadow(0 0 18px rgba(45,212,191,.55));
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* ── Tablet (≤ 1100px) ── */
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-w: 200px;
+  }
+
+  .main {
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .charts {
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  }
 }
 
-100%{
-filter:drop-shadow(0 0 6px rgba(45,212,191,.25));
+/* ── Small Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+
+  body {
+    flex-direction: column;
+  }
+
+  .main {
+    padding: var(--space-md);
+    max-width: 100%;
+  }
+
+  .projects {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .top5-row {
+    grid-template-columns: 1fr;
+  }
 }
 
+/* ── Mobile (≤ 600px) ── */
+@media (max-width: 600px) {
+  .projects {
+    grid-template-columns: 1fr;
+  }
+
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .section-title {
+    font-size: 15px;
+  }
+}
+
+/* ── Very Small (≤ 380px) ── */
+@media (max-width: 380px) {
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Wide screens (≥ 1800px) ── */
+@media (min-width: 1800px) {
+  .main {
+    padding: 48px 80px;
+  }
+
+  .projects {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-accent  { color: var(--accent); }
+.text-muted   { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.text-danger  { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(45,212,191,0.25);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45,212,191,0.45);
+}
+
+/* ── Page Fade In ── */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+body {
+  animation: pageFadeIn 0.5s ease forwards;
 }
