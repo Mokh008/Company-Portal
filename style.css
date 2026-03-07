@@ -885,3 +885,23 @@ filter:drop-shadow(0 0 8px rgba(45,212,191,.25));
 }
 
 }
+/* ================= DASHBOARD LOGO ================= */
+
+.dashboard-logo{
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:600;
+letter-spacing:1px;
+}
+
+.dashboard-logo img{
+height:28px;
+filter:drop-shadow(0 0 10px rgba(45,212,191,.4));
+transition:.3s;
+}
+
+.dashboard-logo img:hover{
+transform:scale(1.08);
+filter:drop-shadow(0 0 20px rgba(45,212,191,.6));
+}
