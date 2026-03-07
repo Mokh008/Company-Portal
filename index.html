@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +7,60 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- ===== BACKGROUND ===== -->
+<div id="mk-bg"></div>
+<div id="mk-overlay"></div>
+
+<!-- ===== STARFALL ===== -->
+<div class="starfall">
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+  <div class="falling-star"></div><div class="falling-star"></div>
+</div>
+
+<!-- ===== LOGIN BOX ===== -->
 <div class="login-container">
   <div class="login-box">
-<div class="mk-logo">MK NEXUS</div>
-    <h2>MK Nexus Portal</h2>
-    <input type="email" id="email" placeholder="Email" autocomplete="username">
-    <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-<button id="loginBtn" type="button" onclick="login()">Login</button>  </div>
+
+    <!-- Inline SVG Logo -->
+    <svg class="login-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+      <defs>
+        <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#2dd4bf"/>
+          <stop offset="50%"  stop-color="#0ea5e9"/>
+          <stop offset="100%" stop-color="#818cf8"/>
+        </linearGradient>
+        <filter id="gw"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="60,4 110,32 110,88 60,116 10,88 10,32" fill="none" stroke="url(#lg1)" stroke-width="2" opacity="0.6" filter="url(#gw)"/>
+      <polygon points="60,14 100,36 100,84 60,106 20,84 20,36" fill="rgba(13,20,40,0.9)" stroke="url(#lg1)" stroke-width="1" opacity="0.8"/>
+      <rect x="28" y="42" width="7" height="36" rx="2" fill="url(#lg1)"/>
+      <rect x="56" y="42" width="7" height="36" rx="2" fill="url(#lg1)"/>
+      <polygon points="28,42 35,42 46.5,62 35,62" fill="url(#lg1)"/>
+      <polygon points="56,42 63,42 52,62 41,62" fill="url(#lg1)"/>
+      <rect x="70" y="42" width="7" height="36" rx="2" fill="url(#lg1)"/>
+      <polygon points="77,42 85,42 77,60 70,60" fill="url(#lg1)"/>
+      <polygon points="77,78 85,78 77,60 70,60" fill="url(#lg1)"/>
+      <circle cx="60" cy="8"   r="3" fill="url(#lg1)" opacity="0.7"/>
+      <circle cx="60" cy="112" r="3" fill="url(#lg1)" opacity="0.7"/>
+    </svg>
+
+    <div class="mk-logo">MK NEXUS</div>
+    <h2>Enterprise Portal</h2>
+
+    <input type="email"    id="email"    placeholder="Email Address" autocomplete="username">
+    <input type="password" id="password" placeholder="Password"      autocomplete="current-password">
+    <button id="loginBtn" type="button" onclick="login()">Sign In</button>
+
+  </div>
 </div>
 
 <!-- ===== LOADER ===== -->
@@ -24,138 +71,104 @@
 <!-- ===== WELCOME SCREEN ===== -->
 <div id="welcomeScreen" class="welcome-overlay">
   <div class="welcome-content">
-    <img src="mk-logo.png" class="welcome-logo">
+
+    <!-- Inline SVG welcome logo (larger) -->
+    <svg class="welcome-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+      <defs>
+        <linearGradient id="wg1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stop-color="#2dd4bf"/>
+          <stop offset="50%"  stop-color="#0ea5e9"/>
+          <stop offset="100%" stop-color="#818cf8"/>
+        </linearGradient>
+        <filter id="wglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <polygon points="60,4 110,32 110,88 60,116 10,88 10,32" fill="none" stroke="url(#wg1)" stroke-width="2.5" opacity="0.7" filter="url(#wglow)"/>
+      <polygon points="60,14 100,36 100,84 60,106 20,84 20,36" fill="rgba(13,20,40,0.85)" stroke="url(#wg1)" stroke-width="1.2" opacity="0.9"/>
+      <rect x="28" y="42" width="7" height="36" rx="2" fill="url(#wg1)"/>
+      <rect x="56" y="42" width="7" height="36" rx="2" fill="url(#wg1)"/>
+      <polygon points="28,42 35,42 46.5,62 35,62" fill="url(#wg1)"/>
+      <polygon points="56,42 63,42 52,62 41,62" fill="url(#wg1)"/>
+      <rect x="70" y="42" width="7" height="36" rx="2" fill="url(#wg1)"/>
+      <polygon points="77,42 85,42 77,60 70,60" fill="url(#wg1)"/>
+      <polygon points="77,78 85,78 77,60 70,60" fill="url(#wg1)"/>
+      <circle cx="60" cy="8"   r="3" fill="url(#wg1)" opacity="0.8"/>
+      <circle cx="60" cy="112" r="3" fill="url(#wg1)" opacity="0.8"/>
+      <circle cx="11" cy="33"  r="3" fill="url(#wg1)" opacity="0.5"/>
+      <circle cx="109" cy="33" r="3" fill="url(#wg1)" opacity="0.5"/>
+      <circle cx="11" cy="87"  r="3" fill="url(#wg1)" opacity="0.5"/>
+      <circle cx="109" cy="87" r="3" fill="url(#wg1)" opacity="0.5"/>
+    </svg>
+
     <h1>Welcome to MK Nexus</h1>
     <p id="welcomeUser"></p>
+
   </div>
+
+  <!-- Progress bar at bottom -->
+  <div class="welcome-progress"></div>
 </div>
 
+<!-- ===== SCRIPTS ===== -->
 <script>
-
 const API_URL = "https://script.google.com/macros/s/AKfycbyKTSBWH2LqvX5wNX717_VWW6Ifeqd97SenJwwLLcrc9C3zOZM-vPY93jE4dn-HtVU5/exec";
-
-const loader = document.getElementById("loader");
+const loader   = document.getElementById("loader");
 const loginBtn = document.getElementById("loginBtn");
 
-/* ============================= */
-/* ===== Auto Clear Session ==== */
-/* ============================= */
+/* ── Clear broken session ── */
 try {
-  const existingUser = JSON.parse(localStorage.getItem("user"));
-  if(existingUser && !existingUser.role){
-    localStorage.removeItem("user");
-  }
-} catch(e){
+  const u = JSON.parse(localStorage.getItem("user"));
+  if (u && !u.role) localStorage.removeItem("user");
+} catch(e) {
   localStorage.removeItem("user");
 }
 
-/* ============================= */
-/* ===== Enter Key Login ======= */
-/* ============================= */
-document.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    login();
-  }
-});
+/* ── Enter key ── */
+document.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
 
-/* ============================= */
-/* ===== LOGIN FUNCTION ======== */
-/* ============================= */
-async function login(){
-
-  const email = document.getElementById("email").value.trim();
+/* ── Login ── */
+async function login() {
+  const email    = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
-
-  if(!email || !password){
-    alert("Please enter email and password");
-    return;
-  }
+  if (!email || !password) { alert("Please enter email and password"); return; }
 
   loginBtn.disabled = true;
   loader.style.display = "flex";
 
-  try{
+  try {
+    const res    = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "login", email, password })
+    });
+    if (!res.ok) throw new Error("Server error");
 
-    const response = await fetch(API_URL,{
-  method:"POST",
-  headers:{
-    "Content-Type":"text/plain;charset=utf-8"
-  },
-  body:JSON.stringify({
-    action:"login",
-    email:email,
-    password:password
-  })
-});
-    if(!response.ok){
-      throw new Error("Server error");
-    }
-
-    const result = await response.json();
-
+    const result = await res.json();
     loader.style.display = "none";
     loginBtn.disabled = false;
 
-    if(result.success && result.user){
-
-      // ===== Data Hardening =====
-      if(!result.user.role){
-        alert("User role not defined");
-        return;
-      }
-
-      if(!result.user.sector){
-        result.user.sector = "";
-      }
-
+    if (result.success && result.user) {
+      if (!result.user.role)   { alert("User role not defined"); return; }
+      if (!result.user.sector) result.user.sector = "";
       localStorage.setItem("user", JSON.stringify(result.user));
       showWelcomeScreen(result.user.name);
-
-    }else{
+    } else {
       alert("Invalid credentials");
     }
-
-  }catch(error){
-
+  } catch(err) {
     loader.style.display = "none";
     loginBtn.disabled = false;
     alert("Connection error. Please try again.");
-
   }
 }
 
-/* ============================= */
-/* ===== Welcome Animation ===== */
-/* ============================= */
-function showWelcomeScreen(name){
-
+/* ── Welcome screen → redirect ── */
+function showWelcomeScreen(name) {
   const screen = document.getElementById("welcomeScreen");
-
-  document.getElementById("welcomeUser").innerText =
-    `Hello ${name}`;
-
+  document.getElementById("welcomeUser").innerText = `Hello, ${name} 👋`;
   screen.style.display = "flex";
-
-  setTimeout(()=>{
-  window.location.href = "dashboard.html";
-},1800);
+  setTimeout(() => { window.location.href = "dashboard.html"; }, 1900);
 }
-
 </script>
-<script>
 
-window.addEventListener("load",()=>{
-
-document.body.style.opacity="0";
-
-setTimeout(()=>{
-document.body.style.transition="opacity .6s";
-document.body.style.opacity="1";
-},100);
-
-});
-
-</script>
 </body>
 </html>
-
