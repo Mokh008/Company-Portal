@@ -905,3 +905,46 @@ transition:.3s;
 transform:scale(1.08);
 filter:drop-shadow(0 0 20px rgba(45,212,191,.6));
 }
+/* MK NEXUS TEXT LOGO */
+
+.mk-logo{
+
+font-size:28px;
+font-weight:700;
+
+letter-spacing:3px;
+
+margin-bottom:20px;
+
+background:linear-gradient(
+90deg,
+#2dd4bf,
+#0ea5e9
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-align:center;
+
+filter:drop-shadow(0 0 10px rgba(45,212,191,.35));
+
+animation:logoGlow 3s ease-in-out infinite;
+
+}
+
+@keyframes logoGlow{
+
+0%{
+filter:drop-shadow(0 0 6px rgba(45,212,191,.25));
+}
+
+50%{
+filter:drop-shadow(0 0 18px rgba(45,212,191,.55));
+}
+
+100%{
+filter:drop-shadow(0 0 6px rgba(45,212,191,.25));
+}
+
+}
