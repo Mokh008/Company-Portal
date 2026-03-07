@@ -201,8 +201,10 @@ th,td{padding:6px;border-bottom:1px solid var(--border);font-size:13px;}
 
 <!-- ===== SIDEBAR ===== -->
 <div class="sidebar">
-  <div class="logo">MK NEXUS</div>
-</div>
+<div class="logo dashboard-logo">
+  <img src="images/mk-logo.png">
+  <span>MK Nexus</span>
+</div></div>
 
 <!-- ===== MAIN DASHBOARD ===== -->
 <div class="main" id="dashboardContent">
@@ -378,9 +380,11 @@ function getProfessionalOptions() {
 
 window.addEventListener("DOMContentLoaded", function () {
 
-  document.getElementById("userInfo").innerText =
-    user.name + " • " + user.role + (user.sector ? " • " + user.sector : "");
-
+  document.getElementById("userInfo").innerHTML =
+"<strong>" + user.name + "</strong> • " +
+user.role +
+(user.sector ? " • " + user.sector : "");
+  
   // Admin-only UI
   if (isAdmin) {
     document.getElementById("adminSectorCard").style.display  = "";
