@@ -837,3 +837,51 @@ transform:scale(1);
 }
 
 }
+/* ================================================= */
+/* ============= MK NEXUS STARTUP LOGO ============== */
+/* ================================================= */
+
+.startup-logo{
+
+opacity:0;
+transform:translateY(20px) scale(.95);
+
+animation:logoStartup 1.2s ease forwards,
+logoGlow 3s ease-in-out infinite 1.2s;
+
+}
+
+@keyframes logoStartup{
+
+0%{
+opacity:0;
+transform:translateY(30px) scale(.9);
+}
+
+60%{
+opacity:1;
+transform:translateY(-4px) scale(1.02);
+}
+
+100%{
+opacity:1;
+transform:translateY(0) scale(1);
+}
+
+}
+
+@keyframes logoGlow{
+
+0%{
+filter:drop-shadow(0 0 8px rgba(45,212,191,.25));
+}
+
+50%{
+filter:drop-shadow(0 0 20px rgba(45,212,191,.55));
+}
+
+100%{
+filter:drop-shadow(0 0 8px rgba(45,212,191,.25));
+}
+
+}
