@@ -402,9 +402,69 @@ function toggleTheme() { document.body.classList.toggle("light"); }
 function logout()      { localStorage.removeItem("user"); window.location.href = "index.html"; }
 function exportPDF()   { html2pdf().from(document.getElementById("dashboardContent")).save("MK_Nexus_Report.pdf"); }
 
-function getProfessionalOptions() {
-  return { responsive: true, maintainAspectRatio: true, aspectRatio: 2 };
+// =====================================================
+// ===== REPLACE getProfessionalOptions() WITH THIS ====
+// =====================================================
+
+function getProfessionalOptions(type = "bar") {
+  const isDark = !document.body.classList.contains("light");
+  const gridColor  = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.06)";
+  const labelColor = isDark ? "#64748b" : "#9ca3af";
+
+  const base = {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: window.innerWidth < 600 ? 1.4 : 2,
+    animation: {
+      duration: 800,
+      easing: "easeOutQuart"
+    },
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        backgroundColor: "rgba(15,22,40,0.92)",
+        borderColor: "rgba(45,212,191,0.3)",
+        borderWidth: 1,
+        titleColor: "#f1f5f9",
+        bodyColor: "#94a3b8",
+        padding: 12,
+        cornerRadius: 10,
+        titleFont: { family: "'Rajdhani', sans-serif", size: 14, weight: "600" },
+        bodyFont:  { family: "'DM Sans', sans-serif",  size: 12 }
+      }
+    },
+    scales: type === "bar" || type === "line" ? {
+      x: {
+        grid:  { color: gridColor, drawBorder: false },
+        ticks: { color: labelColor, font: { family: "'DM Sans', sans-serif", size: 11 } }
+      },
+      y: {
+        beginAtZero: true,
+        grid:  { color: gridColor, drawBorder: false },
+        ticks: { color: labelColor, font: { family: "'DM Sans', sans-serif", size: 11 } }
+      }
+    } : {}
+  };
+
+  return base;
 }
+
+// =====================================================
+// ===== ALSO ADD THIS — Resize handler for charts =====
+// =====================================================
+
+// Add inside window.addEventListener("DOMContentLoaded", ...) :
+window.addEventListener("resize", () => {
+  [adminRentChart, adminEmployeeChart, supplyPlanChart, supplySugarChart, supplyTareChart]
+    .forEach(c => {
+      if (c instanceof Chart) {
+        c.options.aspectRatio = window.innerWidth < 600 ? 1.4 : 2;
+        c.update("none");
+      }
+    });
+});
 
 // =====================================================
 // ================= INIT ==============================
